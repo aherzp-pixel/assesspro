@@ -1336,6 +1336,14 @@ function filterCandidates(q){
 // DETAIL MODAL
 // ============================================================
 function openCandidate(id){
+  // Store full evaluation data in sessionStorage and navigate to informe.html
+  const ev = allEvaluations.find(e=>e.id===id);
+  if(!ev)return;
+  try{ sessionStorage.setItem('ap_ev', JSON.stringify(ev)); }catch(e){}
+  window.location.href = 'informe.html?id=' + encodeURIComponent(id);
+}
+
+function openCandidateOLD(id){
   const ev = allEvaluations.find(e=>e.id===id);
   if(!ev)return;
   const c = ev.candidate||{};

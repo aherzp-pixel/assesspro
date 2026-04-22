@@ -4,55 +4,261 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Informe Psicológico | AssessPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  .bar{position:fixed;top:0;left:0;right:0;background:#1a3a5c;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-  .logo{font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:600}
-  .logo em{color:#e8c060;font-style:italic}
-  .btn-print{background:#c49a3c;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif}
-  .btn-back{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-family:sans-serif}
-  body{margin:0;padding-top:52px;background:#fff}
-  #report{width:100%;min-height:calc(100vh - 52px)}
-  .no-report{text-align:center;padding:4rem 2rem;font-family:sans-serif;color:#666}
-  @media print{.bar{display:none!important}body{padding-top:0}#report{min-height:auto}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:#f8f7f4;color:#1a1a2e;font-size:13px;line-height:1.6}
+.topbar{background:#1a3a5c;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;font-weight:600}
+.logo em{color:#e8c060;font-style:italic}
+.btn-print{background:#c49a3c;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Jost',sans-serif}
+.btn-back{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:9px 16px;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Jost',sans-serif}
+.report{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+.cover{background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;border-radius:14px;padding:40px;margin-bottom:1.5rem}
+.cover-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600}
+.cover-logo em{color:#e8c060;font-style:italic}
+.cover-sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase}
+.cover-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;line-height:1.15;margin:28px 0 14px}
+.cover-title em{color:#e8c060;font-style:italic}
+.cbox{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:18px 22px;margin:12px 0}
+.cname{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px}
+.cmeta{font-size:12px;color:rgba(255,255,255,.75);line-height:2}
+.apt-badge{display:inline-block;padding:8px 22px;border-radius:30px;font-size:13px;font-weight:700;margin-top:12px}
+.cfooter{font-size:10px;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:18px}
+.section{background:#fff;border:1px solid #e2e0db;border-radius:12px;padding:1.5rem;margin-bottom:1.25rem}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a3a5c;padding-bottom:8px;border-bottom:2px solid #1a3a5c;margin-bottom:14px}
+.sec-sub{font-size:11px;font-weight:600;margin:12px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.iitem{background:#f8f7f4;border-radius:6px;padding:10px 14px}
+.ilabel{font-size:10px;color:#7a8194;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.ivalue{font-size:13px;font-weight:500}
+.gscore-row{display:flex;gap:14px;align-items:center;margin:14px 0}
+.gscore{text-align:center;background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;border-radius:10px;padding:16px;width:120px;flex-shrink:0}
+.gnum{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;line-height:1}
+.glbl{font-size:10px;color:rgba(255,255,255,.7);margin-top:2px}
+.glvl{font-size:12px;font-weight:600;color:#e8c060;margin-top:4px}
+.aptbox{flex:1;border-radius:8px;padding:14px 16px;border:2px solid}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:#1a3a5c;color:#fff;padding:7px 10px;text-align:left;font-size:11px;font-weight:500}
+.tbl td{padding:7px 10px;border-bottom:1px solid #e2e0db;color:#3a3f4b}
+.tbl tr:last-child td{border-bottom:none;font-weight:600;background:#f8f7f4}
+.bar-row{margin-bottom:10px}
+.bar-label-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+.bar-track{height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.tlist{list-style:none;padding:0}
+.tlist li{padding:6px 0;border-bottom:1px solid #e2e0db;font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.tlist li:last-child{border-bottom:none}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.discg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.discc{text-align:center;background:#f8f7f4;border-radius:8px;padding:10px 6px}
+.nb{background:#f0f4f8;border-left:4px solid #1a3a5c;border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0;font-size:12px;color:#3a3f4b;line-height:1.7}
+.apt3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.apt3c{background:#f8f7f4;border-radius:8px;padding:12px;text-align:center}
+.recbox{border-radius:10px;padding:16px 18px;border:2px solid}
+.empty{text-align:center;padding:4rem 2rem;color:#7a8194}
+.spinner{width:40px;height:40px;border:3px solid #e2e0db;border-top-color:#1a3a5c;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media print{
+  .topbar{display:none!important}
+  body{background:#fff;padding:0}
+  .report{padding:0;max-width:100%}
+  .cover{border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gscore{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .section{break-inside:avoid}
+  .bar-fill,.cover,.gscore{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
-
-<div class="bar">
-  <div class="logo">Assess<em>Pro</em> &nbsp;·&nbsp; <span style="font-size:12px;color:rgba(255,255,255,.6);font-family:sans-serif">Informe Psicológico</span></div>
+<div class="topbar">
+  <div class="logo">Assess<em>Pro</em> &nbsp;·&nbsp; <span style="font-size:12px;color:rgba(255,255,255,.6);font-family:'Jost',sans-serif">Informe Psicológico</span></div>
   <div style="display:flex;gap:10px">
     <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
     <button class="btn-back" onclick="window.location.href='panel_admin.html'">← Volver al panel</button>
   </div>
 </div>
-
-<div id="report"></div>
-
+<div class="report" id="report">
+  <div class="empty"><div class="spinner"></div><p>Cargando informe...</p></div>
+</div>
 <script>
-  window.onload = function(){
-    try {
-      const html = localStorage.getItem('assesspro_report');
-      if(!html){
-        document.getElementById('report').innerHTML = '<div class="no-report"><h2>No hay informe disponible</h2><p>Vuelve al panel y genera el informe desde la ficha del candidato.</p><br><button onclick="window.location.href=\'panel_admin.html\'" style="padding:10px 20px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">← Volver al panel</button></div>';
-        return;
-      }
-      
-      // Parse the report HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // Inject styles into head
-      const styles = doc.querySelectorAll('style, link[rel="stylesheet"]');
-      styles.forEach(s => document.head.appendChild(s.cloneNode(true)));
-      
-      // Inject body content
-      document.getElementById('report').innerHTML = doc.body.innerHTML;
-      
-    } catch(e) {
-      document.getElementById('report').innerHTML = '<div class="no-report"><p>Error al cargar el informe. Vuelve al panel.</p><br><button onclick="window.location.href=\'panel_admin.html\'" style="padding:10px 20px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer">← Volver</button></div>';
-    }
-  };
-</script>
+function ll(p){return p>=80?'Alto':p>=65?'Mod-Alto':p>=50?'Moderado':p>=35?'Bajo':'Insuficiente';}
+function barRow(name,pct,color){return `<div class="bar-row"><div class="bar-label-row"><span style="font-weight:500">${name}</span><span style="font-weight:600;color:${color}">${pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;}
+function nb(txt){return `<div class="nb">${txt}</div>`;}
 
+window.onload=function(){
+  let ev=null;
+  try{ev=JSON.parse(sessionStorage.getItem('ap_ev'));}catch(e){}
+  if(!ev){
+    document.getElementById('report').innerHTML='<div class="empty"><p>No hay informe disponible.</p><br><button onclick="window.location.href=\'panel_admin.html\'" style="padding:10px 20px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Jost,sans-serif">← Volver al panel</button></div>';
+    return;
+  }
+  const c=ev.candidate||{};
+  const s=ev.scores||{};
+  const g=ev.global||0;
+  const lvl=g>=80?'Sobresaliente':g>=65?'Alto':g>=50?'Moderado':g>=35?'Bajo':'Insuficiente';
+  const aptitud=g>=65?'APTO':g>=50?'APTO CON RESERVAS':'NO APTO';
+  const aptColor=g>=65?'#1d7a4a':g>=50?'#8a5c1a':'#8a1a1a';
+  const aptBg=g>=65?'#e8f5e9':g>=50?'#fff8e1':'#fde8e8';
+  const dateStr=ev.completedAt?new Date(ev.completedAt).toLocaleDateString('es-PE',{year:'numeric',month:'long',day:'numeric'}):'-';
+  const recText=g>=80?`Perfil sobresaliente para ${c.position}. Se recomienda proceder con alta confianza.`
+    :g>=65?`Perfil favorable para ${c.position}. Avanzar complementando con entrevista técnica.`
+    :g>=50?`Perfil moderado. Complementar con prueba técnica y entrevista estructurada.`
+    :`El perfil presenta brechas para ${c.position}. Se recomienda considerar otros candidatos.`;
+
+  // Narrative
+  const F=[],H=[],V=[],D=[];
+  if(s.terman?.iq>=115){F.push('Capacidad intelectual superior');H.push('Análisis complejo y modelación estratégica');}
+  else if(s.terman?.iq>=100){F.push('Capacidad intelectual adecuada para el nivel ejecutivo');}
+  else if(s.terman){D.push('Capacidad analítica — reforzar con prueba técnica');}
+  if(s.valenti){
+    const i=Math.round(s.valenti.dims.integ.raw/s.valenti.dims.integ.max*100);
+    const a=Math.round(s.valenti.dims.anal.raw/s.valenti.dims.anal.max*100);
+    const r=Math.round(s.valenti.dims.res.raw/s.valenti.dims.res.max*100);
+    const ad=Math.round(s.valenti.dims.adap.raw/s.valenti.dims.adap.max*100);
+    if(i>=75){F.push('Alta integridad y ética profesional');V.push('Honestidad y transparencia');}
+    if(a>=70){F.push('Pensamiento analítico desarrollado');H.push('Toma de decisiones basada en datos');}
+    else if(a<55){D.push('Pensamiento analítico — requiere fortalecimiento');}
+    if(r>=70){V.push('Perseverancia y orientación al logro');}
+    if(ad<50){D.push('Adaptabilidad al cambio — área de oportunidad');}
+  }
+  if(s.disc){const dp=s.disc.primary;
+    if(dp==='C'){F.push('Perfil DISC-C: alta compatibilidad con roles analíticos');}
+    else if(dp==='D'){H.push('Toma de decisiones ejecutivas');}
+    else if(dp==='I'){H.push('Comunicación ejecutiva y negociación');}
+    else if(dp==='S'){F.push('Consistencia y confiabilidad en procesos');}
+  }
+  if(s.ie?.pct>=75){F.push('Alta inteligencia emocional');V.push('Empatía y habilidades sociales');}
+  if(s.valores?.pct>=80){F.push('Perfil ético sobresaliente');V.push('Integridad y lealtad institucional');}
+  if(s.resiliencia?.pct>=75){F.push('Alta resiliencia bajo presión');}
+  else if(s.resiliencia?.pct<50){D.push('Resiliencia limitada en entornos de alta presión');}
+  if(s.liderazgo?.pct>=75){F.push('Liderazgo sólido con visión estratégica');H.push('Desarrollo de equipos y gestión de conflictos');}
+  if(s.most){const log=Math.round(s.most.dims.log.raw/s.most.dims.log.max*100);if(log>=70){V.push('Alta motivación de logro');}}
+  if(s.aptitud?.pct>=75){F.push('Alta aptitud numérica, verbal y espacial');}
+
+  // Table
+  const rows=[
+    ['Adaptación Cultural EACE-24',s.eace?.pct,s.eace?ll(s.eace.pct):null],
+    ['Perfil DISC',s.disc?.pcts[s.disc?.primary],s.disc?`Perfil ${s.disc.primary}`:null],
+    ['Test Valenti',s.valenti?.pct,s.valenti?ll(s.valenti.pct):null],
+    ['Test Cleaver',s.cleaver?.pcts[s.cleaver?.primary],s.cleaver?`Perfil ${s.cleaver.primary}`:null],
+    ['Test MOST',s.most?.pct,s.most?ll(s.most.pct):null],
+    ['Terman-Merrill CI',s.terman?.pct,s.terman?`CI ${s.terman.iq} · ${s.terman.cat}`:null],
+    ['Big Five OCEAN',s.bigfive?.pct,s.bigfive?ll(s.bigfive.pct):null],
+    ['Inteligencia Emocional',s.ie?.pct,s.ie?ll(s.ie.pct):null],
+    ['Valores y Ética',s.valores?.pct,s.valores?ll(s.valores.pct):null],
+    ['Estrés y Resiliencia',s.resiliencia?.pct,s.resiliencia?ll(s.resiliencia.pct):null],
+    ['Liderazgo y Decisiones',s.liderazgo?.pct,s.liderazgo?ll(s.liderazgo.pct):null],
+    ['Aptitud Específica',s.aptitud?.pct,s.aptitud?ll(s.aptitud.pct):null],
+  ].filter(r=>r[1]!==undefined&&r[1]!==null);
+
+  let html=`
+  <div class="cover">
+    <div><div class="cover-logo">Assess<em>Pro</em></div><div class="cover-sub">Plataforma de Evaluación Psicológica Profesional</div></div>
+    <div>
+      <div class="cover-title">Informe de<br>Evaluación<br><em>Psicológica</em></div>
+      <div class="cbox">
+        <div class="cname">${c.name||'Candidato'}</div>
+        <div class="cmeta"><strong>Puesto:</strong> ${c.position||'-'}<br><strong>Empresa:</strong> ${c.company||'-'}<br><strong>Fecha:</strong> ${dateStr}<br><strong>Experiencia:</strong> ${c.exp||'-'} · <strong>Educación:</strong> ${c.edu||'-'}</div>
+        <div class="apt-badge" style="background:${aptBg};color:${aptColor}">DICTAMEN: ${aptitud}</div>
+      </div>
+    </div>
+    <div class="cfooter">Documento confidencial · Uso exclusivo del equipo de selección · AssessPro © ${new Date().getFullYear()}</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">1. Resumen ejecutivo</div>
+    <div class="igrid">
+      <div class="iitem"><div class="ilabel">Nombre</div><div class="ivalue">${c.name||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Correo</div><div class="ivalue">${c.email||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Puesto</div><div class="ivalue">${c.position||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Empresa</div><div class="ivalue">${c.company||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Experiencia</div><div class="ivalue">${c.exp||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Educación</div><div class="ivalue">${c.edu||'-'}</div></div>
+    </div>
+    <div class="gscore-row">
+      <div class="gscore"><div class="gnum">${g}%</div><div class="glbl">Puntaje global</div><div class="glvl">${lvl}</div></div>
+      <div class="aptbox" style="border-color:${aptColor};background:${aptBg}">
+        <div style="font-size:15px;font-weight:700;color:${aptColor};margin-bottom:6px">DICTAMEN: ${aptitud}</div>
+        <div style="font-size:12px;color:${aptColor};line-height:1.7">${recText}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">2. Tabla de tabulación</div>
+    <table class="tbl">
+      <thead><tr><th>Batería</th><th>% Logro</th><th>Nivel / Perfil</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}%</td><td>${r[2]}</td></tr>`).join('')}
+      <tr><td><strong>PUNTAJE GLOBAL</strong></td><td><strong>${g}%</strong></td><td><strong>${lvl}</strong></td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">3. Perfil psicológico narrativo</div>
+    ${F.length?`<div class="sec-sub" style="color:#1d7a4a">✦ Fortalezas</div><ul class="tlist">${F.map(f=>`<li><div class="dot" style="background:#1d7a4a"></div>${f}</li>`).join('')}</ul>`:''}
+    ${H.length?`<div class="sec-sub" style="color:#1a3a5c">✦ Habilidades</div><ul class="tlist">${H.map(h=>`<li><div class="dot" style="background:#1a3a5c"></div>${h}</li>`).join('')}</ul>`:''}
+    ${V.length?`<div class="sec-sub" style="color:#c49a3c">✦ Virtudes</div><ul class="tlist">${V.map(v=>`<li><div class="dot" style="background:#c49a3c"></div>${v}</li>`).join('')}</ul>`:''}
+    ${D.length?`<div class="sec-sub" style="color:#8a5c1a">✦ Áreas de desarrollo</div><ul class="tlist">${D.map(d=>`<li><div class="dot" style="background:#e67e22"></div>${d}</li>`).join('')}</ul>`:''}
+  </div>`;
+
+  if(s.disc){const cl={D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'};const nm={D:'Dominancia',I:'Influencia',S:'Estabilidad',C:'Cumplimiento'};
+    html+=`<div class="section"><div class="sec-title">4. Perfil DISC</div>
+    <div class="discg">${['D','I','S','C'].map(k=>`<div class="discc" style="${s.disc.primary===k?'border:2px solid '+cl[k]+';background:#fff':''}"><div style="font-size:20px;font-weight:700;color:${cl[k]}">${k}</div><div style="font-size:10px;color:#7a8194;margin:3px 0">${nm[k]}</div><div class="bar-track" style="margin-top:4px"><div class="bar-fill" style="width:${s.disc.pcts[k]}%;background:${cl[k]}"></div></div><div style="font-size:12px;font-weight:600;color:${cl[k]};margin-top:3px">${s.disc.pcts[k]}%</div></div>`).join('')}</div>
+    ${nb(`Perfil <strong>${s.disc.primary} — ${nm[s.disc.primary]}</strong>: ${{D:'Decisivo y orientado al logro.',I:'Comunicativo y persuasivo.',S:'Consistente y confiable.',C:'Analítico y preciso — alta compatibilidad con roles financieros.'}[s.disc.primary]||''}`)}
+    </div>`;}
+
+  if(s.valenti){html+=`<div class="section"><div class="sec-title">5. Test Valenti (${s.valenti.pct}%)</div>
+    ${[{id:'lid',n:'Liderazgo',c:'#1a3a5c'},{id:'res',n:'Orientación a resultados',c:'#c0392b'},{id:'team',n:'Trabajo en equipo',c:'#27ae60'},{id:'anal',n:'Pensamiento analítico',c:'#2980b9'},{id:'adap',n:'Adaptabilidad',c:'#8e44ad'},{id:'integ',n:'Integridad',c:'#c49a3c'}].map(d=>{const p=Math.round(s.valenti.dims[d.id].raw/s.valenti.dims[d.id].max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.bigfive){html+=`<div class="section"><div class="sec-title">6. Big Five OCEAN (${s.bigfive.pct}%)</div>
+    ${[{id:'O',n:'Apertura',c:'#00897b'},{id:'C',n:'Responsabilidad',c:'#1a3a5c'},{id:'E',n:'Extraversión',c:'#e91e63'},{id:'A',n:'Amabilidad',c:'#27ae60'},{id:'N',n:'Neuroticismo',c:'#f57c00'}].map(d=>{const dim=s.bigfive.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.most){const dims=[{id:'log',n:'Logro',c:'#c0392b'},{id:'afil',n:'Afiliación',c:'#27ae60'},{id:'pod',n:'Poder',c:'#1a3a5c'},{id:'seg',n:'Seguridad',c:'#c49a3c'}];
+    const dom=dims.reduce((a,d)=>s.most.dims[d.id].raw>s.most.dims[a.id].raw?d:a,dims[0]);
+    html+=`<div class="section"><div class="sec-title">7. Test MOST (${s.most.pct}%)</div>
+    ${dims.map(d=>{const p=Math.round(s.most.dims[d.id].raw/s.most.dims[d.id].max*100);return barRow(d.n,p,d.c);}).join('')}
+    ${nb(`Motivación dominante: <strong>${dom.n}</strong>`)}</div>`;}
+
+  if(s.ie){html+=`<div class="section"><div class="sec-title">8. Inteligencia Emocional (${s.ie.pct}%)</div>
+    ${[{id:'auto',n:'Autoconciencia',c:'#e91e63'},{id:'reg',n:'Autorregulación',c:'#9c27b0'},{id:'emp',n:'Empatía',c:'#00897b'},{id:'mot',n:'Motivación emocional',c:'#e67e22'},{id:'social',n:'Habilidades sociales',c:'#1a3a5c'}].map(d=>{const dim=s.ie.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.valores){html+=`<div class="section"><div class="sec-title">9. Valores y Ética (${s.valores.pct}%)</div>
+    ${[{id:'hon',n:'Honestidad',c:'#1a3a5c'},{id:'leal',n:'Lealtad',c:'#27ae60'},{id:'resp',n:'Responsabilidad',c:'#c49a3c'},{id:'just',n:'Justicia',c:'#2980b9'},{id:'etica',n:'Ética profesional',c:'#6d4c41'}].map(d=>{const dim=s.valores.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.resiliencia){html+=`<div class="section"><div class="sec-title">10. Estrés y Resiliencia (${s.resiliencia.pct}%)</div>
+    ${[{id:'tol',n:'Tolerancia al estrés',c:'#f57c00'},{id:'rec',n:'Recuperación',c:'#1d7a4a'},{id:'cambio',n:'Manejo del cambio',c:'#7b1fa2'},{id:'bien',n:'Bienestar',c:'#2980b9'}].map(d=>{const dim=s.resiliencia.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.liderazgo){html+=`<div class="section"><div class="sec-title">11. Liderazgo y Decisiones (${s.liderazgo.pct}%)</div>
+    ${[{id:'vision',n:'Visión estratégica',c:'#1a3a5c'},{id:'dev',n:'Desarrollo de personas',c:'#27ae60'},{id:'dec',n:'Toma de decisiones',c:'#c0392b'},{id:'inf',n:'Influencia',c:'#e67e22'},{id:'conf',n:'Gestión del conflicto',c:'#8e44ad'}].map(d=>{const dim=s.liderazgo.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.aptitud){html+=`<div class="section"><div class="sec-title">12. Aptitud Específica (${s.aptitud.pct}%)</div>
+    <div class="apt3">${[{k:'num',n:'Numérica',c:'#1565c0'},{k:'verb',n:'Verbal',c:'#00897b'},{k:'esp',n:'Espacial',c:'#7b1fa2'}].map(d=>{const corr=s.aptitud.dims[d.k]?.corr||0;const p=Math.round(corr/10*100);return `<div class="apt3c"><div style="font-size:13px;font-weight:600;color:${d.c};margin-bottom:4px">${d.n}</div><div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:${d.c}">${p}%</div><div style="font-size:11px;color:#7a8194">${corr}/10</div></div>`;}).join('')}</div></div>`;}
+
+  if(s.terman){html+=`<div class="section"><div class="sec-title">13. Terman-Merrill — CI estimado</div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="text-align:center;background:#f0f4f8;border-radius:10px;padding:14px 20px;flex-shrink:0"><div style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:#1a3a5c;line-height:1">${s.terman.iq}</div><div style="font-size:12px;font-weight:600;color:#c49a3c">${s.terman.cat}</div></div>
+      <div style="flex:1">${barRow(`Aciertos: ${s.terman.correct}/${s.terman.total}`,s.terman.pct,'#2980b9')}${nb(s.terman.iq>=120?'Capacidad cognitiva muy alta.':s.terman.iq>=110?'Buena capacidad intelectual.':s.terman.iq>=90?'Capacidad promedio — complementar con evaluación técnica.':'Capacidad por debajo del promedio ejecutivo.')}</div>
+    </div></div>`;}
+
+  if(s.eace){html+=`<div class="section"><div class="sec-title">14. Adaptación Cultural EACE-24 (${s.eace.pct}%)</div>
+    ${[{id:'flex',n:'Flexibilidad cognitiva',c:'#1a3a5c'},{id:'emo',n:'Regulación emocional',c:'#27ae60'},{id:'social',n:'Competencia social',c:'#2980b9'},{id:'iden',n:'Identidad y resiliencia',c:'#8e44ad'}].map(d=>{const dim=s.eace.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return barRow(d.n,p,d.c);}).join('')}</div>`;}
+
+  if(s.cleaver){const cl={D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'};const nm={D:'Dominancia',I:'Influencia',S:'Estabilidad',C:'Cumplimiento'};
+    html+=`<div class="section"><div class="sec-title">15. Test Cleaver</div>
+    <div class="discg">${['D','I','S','C'].map(k=>`<div class="discc" style="${s.cleaver.primary===k?'border:2px solid '+cl[k]+';background:#fff':''}"><div style="font-size:20px;font-weight:700;color:${cl[k]}">${k}</div><div style="font-size:10px;color:#7a8194;margin:3px 0">${nm[k]}</div><div class="bar-track"><div class="bar-fill" style="width:${s.cleaver.pcts[k]}%;background:${cl[k]}"></div></div><div style="font-size:12px;font-weight:600;color:${cl[k]};margin-top:3px">${s.cleaver.pcts[k]}%</div></div>`).join('')}</div></div>`;}
+
+  html+=`<div class="section">
+    <div class="sec-title">Recomendación final</div>
+    <div class="recbox" style="background:${aptBg};border-color:${aptColor}">
+      <div style="font-size:16px;font-weight:700;color:${aptColor};margin-bottom:8px">DICTAMEN: ${aptitud}</div>
+      <div style="font-size:13px;line-height:1.8;color:${aptColor};margin-bottom:${g>=65?'10px':'0'}">${recText}</div>
+      ${g>=65?`<div style="font-size:12px;color:${aptColor}"><strong>Próximos pasos:</strong><br>${g>=80?'✓ Entrevista con gerente · ✓ Verificar referencias · ✓ Presentar oferta':'✓ Prueba técnica · ✓ Entrevista por competencias · ✓ Verificar referencias'}</div>`:''}
+    </div>
+  </div>`;
+
+  document.getElementById('report').innerHTML=html;
+};
+</script>
 </body>
 </html>
