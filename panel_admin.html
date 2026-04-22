@@ -145,21 +145,9 @@ body{font-family:'Jost',sans-serif;background:var(--surface);color:var(--ink);mi
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen" class="login-screen">
-  <div class="login-box">
-    <div class="login-logo">Assess<span>Pro</span></div>
-    <div class="login-sub">Panel de Administración</div>
-    <div class="login-err" id="login-err">Credenciales incorrectas. Intenta de nuevo.</div>
-    <input type="email" id="login-email" placeholder="Correo de administrador" autocomplete="username">
-    <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" onkeyup="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()" type="button">Ingresar al panel →</button>
-    <div style="margin-top:1rem;font-size:11px;color:var(--ink3);text-align:center">Acceso restringido · Solo personal autorizado</div>
-  </div>
-</div>
-
+<!-- LOGIN REMOVED - Direct access -->
 <!-- APP -->
-<div class="app-layout" id="app-layout">
+<div class="app-layout" id="app-layout" style="display:flex">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -1041,16 +1029,23 @@ let allEvaluations = [];
 let filteredEvaluations = [];
 
 function doLogin(){
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  if(!email || !pass){
-    document.getElementById('login-err').style.display = 'block';
-    return;
-  }
-  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
-    enterPanel();
-  } else {
-    document.getElementById('login-err').style.display = 'block';
+  try {
+    const emailEl = document.getElementById('login-email');
+    const passEl = document.getElementById('login-pass');
+    if(!emailEl || !passEl) { alert('Error de carga. Recarga la página.'); return; }
+    const email = emailEl.value.trim();
+    const pass = passEl.value;
+    if(!email || !pass){
+      document.getElementById('login-err').style.display = 'block';
+      return;
+    }
+    if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
+      enterPanel();
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+    }
+  } catch(err) {
+    alert('Error: ' + err.message);
   }
 }
 
@@ -1061,12 +1056,7 @@ function enterPanel(){
   loadData();
 }
 
-function doLogout(){
-  document.getElementById('app-layout').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-pass').value = '';
-}
+function doLogout(){ window.location.reload(); }
 
 function changePassword(){
   const np = document.getElementById('new-pass').value.trim();
