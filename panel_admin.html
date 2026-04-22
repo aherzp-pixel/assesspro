@@ -1379,9 +1379,8 @@ function openCandidate(id){
   // Recommendations
   body += buildRecommendations(s, g);
 
-  // Action buttons
-  window._currentReportId = id;
-  body += '<div style="margin-top:1.5rem"><button onclick="runPDFReport()" style="width:100%;padding:13px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif">📋 Ver Informe Completo</button></div>';
+  // Action buttons - embed id directly in onclick
+  body += '<div style="margin-top:1.5rem"><button onclick="generatePDFReport(\'' + id + '\')" style="width:100%;padding:13px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif">📋 Ver Informe Completo</button></div>';
 
   document.getElementById('modal-body').innerHTML = body;
   document.getElementById('modal-overlay').classList.add('open');
