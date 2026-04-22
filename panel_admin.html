@@ -1381,7 +1381,7 @@ function openCandidate(id){
 
   // Action buttons
   window._currentReportId = id;
-  body += '<div style="display:flex;gap:10px;margin-top:1.5rem"><button onclick="runPDFReport()" style="flex:1;padding:12px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-family:Jost,sans-serif;font-size:13px;font-weight:600;cursor:pointer">⬇ Exportar Informe</button></div>';
+  body += '<div style="margin-top:1.5rem"><button onclick="runPDFReport()" style="width:100%;padding:13px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif">📋 Ver Informe Completo</button></div>';
 
   document.getElementById('modal-body').innerHTML = body;
   document.getElementById('modal-overlay').classList.add('open');
@@ -1806,15 +1806,39 @@ body{font-family:'Jost',sans-serif;color:#1a1a2e;background:#fff;font-size:13px;
 
 </body></html>`;
 
-  // Simplest possible approach - encode as data URI and navigate
-  const dataUri = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
-  const link = document.createElement('a');
-  link.href = dataUri;
-  link.download = 'Informe_' + (c.name||'candidato').replace(/[^a-zA-Z0-9]/g,'_') + '.html';
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  setTimeout(()=>{ document.body.removeChild(link); }, 1000);
+  // Close modal
+  document.getElementById('modal-overlay').classList.remove('open');
+
+  // Get or create fullscreen report container
+  let viewer = document.getElementById('ap-report-viewer');
+  if(!viewer){
+    viewer = document.createElement('div');
+    viewer.id = 'ap-report-viewer';
+    viewer.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto;';
+    document.body.appendChild(viewer);
+  }
+
+  // Build viewer with print button
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const reportStyles = Array.from(doc.querySelectorAll('style')).map(s=>s.textContent).join('');
+  const reportBody = doc.body.innerHTML;
+
+  viewer.innerHTML = `
+    <div style="position:sticky;top:0;background:#1a3a5c;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:10000;print-color-adjust:exact">
+      <div style="font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:600">Assess<span style="color:#e8c060;font-style:italic">Pro</span> · Informe</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="window.print()" style="background:#c49a3c;color:#fff;border:none;padding:10px 22px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer">🖨 Imprimir / PDF</button>
+        <button onclick="document.getElementById('ap-report-viewer').style.display='none'" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:10px 16px;border-radius:6px;font-size:13px;cursor:pointer">✕ Cerrar</button>
+      </div>
+    </div>
+    <style>${reportStyles}
+    @media print { #ap-report-viewer > div:first-child { display:none!important; } }
+    </style>
+    <div style="max-width:900px;margin:0 auto;padding:20px">${reportBody}</div>
+  `;
+  viewer.style.display = 'block';
+  viewer.scrollTop = 0;
 }
 </script>
 </body>
