@@ -1538,13 +1538,6 @@ function levelLabel(pct){return pct>=80?'Alto':pct>=65?'Moderado-Alto':pct>=50?'
 // ============================================================
 // PDF REPORT GENERATOR
 // ============================================================
-function runPDFReport(){}
-function showInlineReport(id){}
-
-function generatePDFHTML(id){
-  // Returns HTML string for printing
-  const _buildHtml = true;
-
 function generatePDFReport(id){
   const ev=allEvaluations.find(e=>e.id===id);
   if(!ev)return;
