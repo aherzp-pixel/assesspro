@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Psicológico | AssessPro</title>
+<style>
+  .bar{position:fixed;top:0;left:0;right:0;background:#1a3a5c;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .logo{font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:600}
+  .logo em{color:#e8c060;font-style:italic}
+  .btn-print{background:#c49a3c;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif}
+  .btn-back{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-family:sans-serif}
+  body{margin:0;padding-top:52px;background:#fff}
+  #report{width:100%;min-height:calc(100vh - 52px)}
+  .no-report{text-align:center;padding:4rem 2rem;font-family:sans-serif;color:#666}
+  @media print{.bar{display:none!important}body{padding-top:0}#report{min-height:auto}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="logo">Assess<em>Pro</em> &nbsp;·&nbsp; <span style="font-size:12px;color:rgba(255,255,255,.6);font-family:sans-serif">Informe Psicológico</span></div>
+  <div style="display:flex;gap:10px">
+    <button class="btn-print" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
+    <button class="btn-back" onclick="window.location.href='panel_admin.html'">← Volver al panel</button>
+  </div>
+</div>
+
+<div id="report"></div>
+
+<script>
+  window.onload = function(){
+    try {
+      const html = localStorage.getItem('assesspro_report');
+      if(!html){
+        document.getElementById('report').innerHTML = '<div class="no-report"><h2>No hay informe disponible</h2><p>Vuelve al panel y genera el informe desde la ficha del candidato.</p><br><button onclick="window.location.href=\'panel_admin.html\'" style="padding:10px 20px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">← Volver al panel</button></div>';
+        return;
+      }
+      
+      // Parse the report HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Inject styles into head
+      const styles = doc.querySelectorAll('style, link[rel="stylesheet"]');
+      styles.forEach(s => document.head.appendChild(s.cloneNode(true)));
+      
+      // Inject body content
+      document.getElementById('report').innerHTML = doc.body.innerHTML;
+      
+    } catch(e) {
+      document.getElementById('report').innerHTML = '<div class="no-report"><p>Error al cargar el informe. Vuelve al panel.</p><br><button onclick="window.location.href=\'panel_admin.html\'" style="padding:10px 20px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer">← Volver</button></div>';
+    }
+  };
+</script>
+
+</body>
+</html>

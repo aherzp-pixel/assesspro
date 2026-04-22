@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Administración | AssessPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f1117;--ink2:#3a3f4b;--ink3:#7a8194;
+  --surface:#f2f1ee;--white:#fff;--border:#e2e0db;
+  --accent:#1a3a5c;--accent2:#2d5f8a;--gold:#c49a3c;--gold2:#e8c060;
+  --success:#1d7a4a;--success-bg:#e8f5e9;
+  --warn:#8a5c1a;--warn-bg:#fff8e1;
+  --danger:#8a1a1a;--danger-bg:#fde8e8;
+  --disc-d:#c0392b;--disc-i:#e67e22;--disc-s:#27ae60;--disc-c:#2980b9;
+  --sidebar:240px;--r:8px;--r2:14px;
+}
+body{font-family:'Jost',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+/* LOGIN */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--accent)}
+.login-box{background:var(--white);border-radius:var(--r2);padding:2.5rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.login-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--accent);text-align:center;margin-bottom:.25rem}
+.login-logo span{color:var(--gold);font-style:italic}
+.login-sub{text-align:center;font-size:12px;color:var(--ink3);margin-bottom:2rem;letter-spacing:.05em;text-transform:uppercase}
+.login-box input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border .15s;margin-bottom:12px;background:var(--surface)}
+.login-box input:focus{border-color:var(--accent2);background:var(--white)}
+.login-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:'Jost',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--accent2)}
+.login-err{background:var(--danger-bg);color:var(--danger);border-radius:var(--r);padding:9px 13px;font-size:13px;margin-bottom:12px;display:none}
+
+/* APP */
+.app-layout{display:flex;flex:1;display:none}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--accent);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200}
+.sb-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600}
+.sb-logo-text span{color:var(--gold2);font-style:italic}
+.sb-logo-sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.sb-nav{flex:1;padding:1rem 0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 1.25rem;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.sb-item.active{color:#fff;background:rgba(255,255,255,.1);border-left-color:var(--gold2)}
+.sb-icon{font-size:16px;width:20px;text-align:center}
+.sb-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.4)}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:.875rem 1.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--accent)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-badge{font-size:11px;color:var(--ink3);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px}
+.logout-btn{font-size:12px;color:var(--ink3);cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:var(--r);transition:all .15s;background:var(--white)}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+
+.content{padding:1.75rem;flex:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.75rem}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);padding:1.1rem 1.25rem}
+.stat-label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stat-value{font-size:28px;font-weight:600;font-family:'Cormorant Garamond',serif;color:var(--accent)}
+.stat-sub{font-size:11px;color:var(--ink3);margin-top:3px}
+
+/* CANDIDATES TABLE */
+.section-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:1.5rem}
+.sc-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.sc-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--accent)}
+.sc-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 14px;border-radius:var(--r);font-family:'Jost',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--ink2);transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-sm.primary:hover{background:var(--accent2)}
+
+/* TABLE */
+.cand-table{width:100%;border-collapse:collapse}
+.cand-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);border-bottom:1px solid var(--border);background:var(--surface)}
+.cand-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2);vertical-align:middle}
+.cand-table tr:last-child td{border-bottom:none}
+.cand-table tr:hover td{background:#fafaf8;cursor:pointer}
+.cand-name{font-weight:600;color:var(--ink)}
+.cand-email{font-size:12px;color:var(--ink3)}
+.score-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.level-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.disc-tag-sm{display:inline-block;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700;color:#fff;text-align:center;line-height:24px}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--ink3)}
+.empty-icon{font-size:40px;margin-bottom:.75rem}
+.empty-text{font-size:14px}
+
+/* DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,17,23,.5);z-index:500;display:none;align-items:flex-start;justify-content:flex-end;padding:0}
+.modal-overlay.open{display:flex}
+.modal-panel{background:var(--white);width:min(680px,100vw);height:100vh;overflow-y:auto;box-shadow:-4px 0 30px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.modal-header{background:var(--accent);color:#fff;padding:1.5rem;position:sticky;top:0;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-body{padding:1.5rem;flex:1}
+.modal-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+.modal-meta{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+.modal-global{font-size:13px;margin-top:.75rem;display:flex;gap:12px;flex-wrap:wrap}
+.mgpill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;font-size:12px}
+
+/* DETAIL SECTIONS */
+.detail-section{margin-bottom:1.5rem}
+.ds-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--accent);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.bar-row{margin-bottom:10px}
+.bar-label-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+.bar-name{font-weight:500;color:var(--ink)}
+.bar-pct{font-weight:600}
+.bar-track{height:7px;background:#eee;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.interp{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:.875rem 1rem;font-size:12px;color:var(--ink2);line-height:1.6;margin:.75rem 0}
+
+/* DISC mini */
+.disc-mini-bars{display:flex;gap:12px;margin:.75rem 0}
+.disc-mini-col{text-align:center;flex:1}
+.disc-mini-bar-wrap{height:80px;display:flex;align-items:flex-end;justify-content:center;background:var(--surface);border-radius:var(--r);overflow:hidden}
+.disc-mini-fill{width:100%;border-radius:4px 4px 0 0;transition:height .6s}
+.disc-mini-lbl{font-size:11px;font-weight:700;margin-top:4px}
+.disc-mini-pct{font-size:12px;font-weight:600}
+
+/* Summary table */
+.sum-table{width:100%;border-collapse:collapse;font-size:13px}
+.sum-table th{background:var(--surface);padding:7px 10px;text-align:left;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);border-bottom:1px solid var(--border)}
+.sum-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--ink2)}
+.sum-table tr:last-child td{border-bottom:none;font-weight:600;background:var(--surface);color:var(--ink)}
+
+/* Recommendation pills */
+.rec-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5rem}
+.rec-tag{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* Search */
+.search-bar{padding:8px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:13px;color:var(--ink);background:var(--surface);outline:none;width:220px;transition:border .15s}
+.search-bar:focus{border-color:var(--accent2);background:var(--white)}
+
+/* Loading */
+.loading{text-align:center;padding:2rem;color:var(--ink3)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media print{.sidebar,.topbar,.modal-overlay,.sc-actions{display:none!important}.main{margin-left:0!important}.content{padding:0}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Assess<span>Pro</span></div>
+    <div class="login-sub">Panel de Administración</div>
+    <div class="login-err" id="login-err">Credenciales incorrectas. Intenta de nuevo.</div>
+    <input type="email" id="login-email" placeholder="Correo de administrador" autocomplete="username">
+    <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Ingresar al panel →</button>
+    <div style="margin-top:1rem;font-size:11px;color:var(--ink3);text-align:center">Acceso restringido · Solo personal autorizado</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app-layout" id="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-text">Assess<span>Pro</span></div>
+      <div class="sb-logo-sub">Panel administrativo</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item active" onclick="showTab('dashboard')"><span class="sb-icon">📊</span> Dashboard</div>
+      <div class="sb-item" onclick="showTab('crear')"><span class="sb-icon">🔗</span> Crear Link</div>
+      <div class="sb-item" onclick="showTab('candidatos')"><span class="sb-icon">👥</span> Candidatos</div>
+      <div class="sb-item" onclick="showTab('configuracion')"><span class="sb-icon">⚙️</span> Configuración</div>
+    </nav>
+    <div class="sb-footer">AssessPro v2.0<br>© 2025 Evaluación Psicológica</div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="topbar-badge" id="tb-date"></span>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total candidatos</div><div class="stat-value" id="st-total">–</div><div class="stat-sub">evaluaciones completadas</div></div>
+          <div class="stat-card"><div class="stat-label">Promedio global</div><div class="stat-value" id="st-avg">–</div><div class="stat-sub">puntaje promedio</div></div>
+          <div class="stat-card"><div class="stat-label">Perfil DISC más común</div><div class="stat-value" id="st-disc">–</div><div class="stat-sub">en candidatos evaluados</div></div>
+          <div class="stat-card"><div class="stat-label">CI promedio</div><div class="stat-value" id="st-iq">–</div><div class="stat-sub">Terman-Merrill</div></div>
+        </div>
+        <div class="section-card">
+          <div class="sc-header"><div class="sc-title">Últimas evaluaciones</div></div>
+          <div id="recent-list"></div>
+        </div>
+      </div>
+
+      <!-- CREAR LINK TAB -->
+      <div id="tab-crear" style="display:none">
+        <div class="section-card">
+          <div class="sc-header"><div class="sc-title">Crear link de evaluación</div></div>
+          <div style="padding:1.5rem">
+            <p style="font-size:13px;color:var(--ink2);margin-bottom:1.5rem;line-height:1.7">Selecciona el rubro y puesto para generar un link personalizado. El candidato verá las pruebas adaptadas a su perfil y el informe PDF incluirá el dictamen específico para ese cargo.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+              <div class="fg"><label>Rubro de empresa</label>
+                <select id="admin-rubro" onchange="adminRubroChange()" style="padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:14px;outline:none">
+                  <option value="">— Selecciona el rubro —</option>
+                </select>
+              </div>
+              <div class="fg"><label>Puesto evaluado</label>
+                <select id="admin-puesto" onchange="adminPuestoChange()" style="padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:14px;outline:none">
+                  <option value="">— Selecciona el puesto —</option>
+                </select>
+              </div>
+            </div>
+            <div id="admin-profile-info" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem;margin-bottom:1.5rem">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--accent);margin-bottom:6px" id="api-title"></div>
+              <div style="font-size:13px;color:var(--ink2);margin-bottom:10px" id="api-desc"></div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" id="api-tests"></div>
+              <div style="font-size:12px;color:var(--ink3)"><strong>Competencias evaluadas:</strong> <span id="api-comp"></span></div>
+              <div style="font-size:12px;color:var(--ink3);margin-top:4px"><strong>Puntaje mínimo de aptitud:</strong> <span id="api-min"></span>%</div>
+            </div>
+            <div id="admin-link-box" style="display:none;background:#e8f5e9;border:1px solid #1d7a4a;border-radius:var(--r2);padding:1.25rem;margin-bottom:1rem">
+              <div style="font-size:12px;font-weight:600;color:#1d7a4a;margin-bottom:8px">✓ Link generado para este perfil:</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <input id="admin-link-input" readonly style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #1d7a4a;border-radius:var(--r);font-family:'Jost',sans-serif;font-size:12px;background:#fff;color:var(--ink)" value="">
+                <button onclick="copyAdminLink()" class="btn-sm primary" style="flex-shrink:0">📋 Copiar link</button>
+              </div>
+              <div style="font-size:11px;color:#1d7a4a;margin-top:8px">Puedes enviar este link directamente al candidato por correo o WhatsApp. Cada candidato ingresará sus datos al inicio.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CANDIDATOS TAB -->
+      <div id="tab-candidatos" style="display:none">
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-title">Todos los candidatos</div>
+            <div class="sc-actions">
+              <input class="search-bar" type="text" placeholder="Buscar por nombre..." oninput="filterCandidates(this.value)">
+              <button class="btn-sm" onclick="exportCSV()">⬇ Exportar CSV</button>
+              <button class="btn-sm primary" onclick="refreshData()">↻ Actualizar</button>
+            </div>
+          </div>
+          <div id="candidates-table-wrap"></div>
+        </div>
+      </div>
+
+      <!-- CONFIG TAB -->
+      <div id="tab-configuracion" style="display:none">
+        <div class="section-card" style="padding:1.5rem">
+          <div class="sc-header"><div class="sc-title">Configuración de Firebase</div></div>
+          <div style="padding:1.5rem">
+            <div style="background:#fff8e1;border:1px solid var(--gold);border-radius:var(--r);padding:1rem;margin-bottom:1.5rem;font-size:13px;color:var(--warn);line-height:1.7">
+              <strong>⚙️ Paso a paso para activar la base de datos:</strong><br><br>
+              1. Ve a <strong>console.firebase.google.com</strong> → Crea un proyecto gratis<br>
+              2. En el proyecto → <strong>Firestore Database</strong> → "Crear base de datos" → Modo producción<br>
+              3. Ve a <strong>Configuración del proyecto</strong> → "Tus apps" → Agrega app web → Copia las credenciales<br>
+              4. Abre el archivo <code>prueba_candidato.html</code> con un editor de texto<br>
+              5. Busca la sección <code>🔧 CONFIGURACIÓN FIREBASE</code> y reemplaza los valores<br>
+              6. Haz lo mismo en este archivo <code>panel_admin.html</code><br>
+              7. Sube ambos archivos a <strong>Firebase Hosting</strong> (gratis) o cualquier hosting<br><br>
+              <strong>¿Sin hosting propio?</strong> Puedes usar <strong>Netlify.com</strong> o <strong>Vercel.com</strong> — ambos gratuitos, arrastra y suelta los archivos.
+            </div>
+            <div style="font-size:13px;color:var(--ink2);line-height:1.8">
+              <strong>Credenciales actualmente configuradas:</strong><br>
+              Project ID: <code id="cfg-project">No configurado</code><br>
+              Estado Firebase: <span id="cfg-status" style="color:var(--warn)">Pendiente de configuración</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-card" style="margin-top:1rem">
+          <div class="sc-header"><div class="sc-title">Cambiar contraseña del panel</div></div>
+          <div style="padding:1.5rem;display:flex;flex-direction:column;gap:10px;max-width:360px">
+            <input type="password" id="new-pass" placeholder="Nueva contraseña" style="padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:14px;outline:none">
+            <button class="btn-sm primary" onclick="changePassword()">Guardar contraseña</button>
+            <div id="pass-msg" style="font-size:12px;color:var(--success);display:none">✓ Contraseña actualizada correctamente</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-panel" id="modal-panel">
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- REPORT VIEWER IFRAME -->
+<div id="report-overlay" style="display:none;position:fixed;inset:0;background:#1a3a5c;z-index:2000;flex-direction:column">
+  <div style="padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;font-weight:600">Assess<span style="color:#e8c060;font-style:italic">Pro</span> · Informe Psicológico</div>
+    <div style="display:flex;gap:10px">
+      <button id="btn-print-report" style="background:#c49a3c;color:#fff;border:none;padding:9px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">🖨 Imprimir / Guardar PDF</button>
+      <button onclick="document.getElementById('report-overlay').style.display='none'" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:6px;font-size:13px;cursor:pointer">✕ Cerrar</button>
+    </div>
+  </div>
+  <iframe id="report-iframe" style="flex:1;width:100%;border:none;background:#fff"></iframe>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ============================================================
+// 🔧 CONFIGURACIÓN FIREBASE — Mismos datos que prueba_candidato.html
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDZLFc11HF14dMm-u_VgaN9iMIwk7gbdsg",
+  authDomain: "assesspro-fab70.firebaseapp.com",
+  projectId: "assesspro-fab70",
+  storageBucket: "assesspro-fab70.firebasestorage.app",
+  messagingSenderId: "200967457769",
+  appId: "1:200967457769:web:5811e210aaa2e68aad9978"
+};
+// ============================================================
+
+try{
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+  window._collection = collection;
+  window._getDocs = getDocs;
+  window._query = query;
+  window._orderBy = orderBy;
+  window._firebaseReady = true;
+  document.getElementById('cfg-project').textContent = firebaseConfig.projectId;
+  document.getElementById('cfg-status').textContent = '✓ Configurado';
+  document.getElementById('cfg-status').style.color = 'var(--success)';
+}catch(e){
+  window._firebaseReady = false;
+}
+</script>
+
+<script>
+// ============================================================
+// ASSESSPRO — PERFILES POR RUBRO Y PUESTO
+// ============================================================
+const RUBROS = [
+  {
+    id: 'finanzas_admin', nombre: 'Finanzas y Administración',
+    icon: '💼',
+    puestos: [
+      {
+        id: 'jefe_finanzas', nombre: 'Jefe de Finanzas',
+        tests: ['terman','valenti','disc','cleaver','most'],
+        competencias: ['Pensamiento analítico','Integridad','Orientación a resultados','Liderazgo financiero','Toma de decisiones'],
+        descripcion: 'Responsable de la gestión financiera, control presupuestario y cumplimiento normativo.',
+        puntajeMinimo: 65,
+        pesoTests: {terman:25, valenti:30, disc:15, cleaver:10, most:20},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Perfil financiero sobresaliente. Combina capacidad analítica, integridad y orientación a resultados. Altamente recomendado para el cargo.',
+          medio: 'Perfil adecuado con áreas de oportunidad. Validar con prueba técnica financiera y entrevista por competencias.',
+          bajo: 'El perfil no alcanza los estándares mínimos para el cargo. Se recomienda considerar otros candidatos.'
+        }
+      },
+      {
+        id: 'contador', nombre: 'Contador / Contadora',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Precisión y exactitud','Ética profesional','Organización','Análisis numérico','Responsabilidad'],
+        descripcion: 'Responsable de la contabilidad, declaraciones fiscales y estados financieros.',
+        puntajeMinimo: 60,
+        pesoTests: {terman:30, valenti:35, disc:20, most:15},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Perfil contable excelente. Alta precisión, integridad y capacidad analítica. Recomendado.',
+          medio: 'Cumple requisitos básicos. Evaluar experiencia técnica contable.',
+          bajo: 'No alcanza el perfil mínimo para el área contable.'
+        }
+      },
+      {
+        id: 'asistente_admin', nombre: 'Asistente Administrativo',
+        tests: ['valenti','disc','most','eace'],
+        competencias: ['Organización','Comunicación','Trabajo en equipo','Proactividad','Adaptabilidad'],
+        descripcion: 'Soporte administrativo, gestión documental y coordinación de actividades.',
+        puntajeMinimo: 55,
+        pesoTests: {valenti:35, disc:25, most:20, eace:20},
+        discIdeal: 'S',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Excelente perfil administrativo. Alta organización, disposición de servicio y trabajo en equipo.',
+          medio: 'Perfil adecuado. Desarrollar habilidades de comunicación y proactividad.',
+          bajo: 'No cumple con el perfil requerido para el puesto administrativo.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'comercial_ventas', nombre: 'Comercial y Ventas',
+    icon: '📈',
+    puestos: [
+      {
+        id: 'ejecutivo_ventas', nombre: 'Ejecutivo de Ventas',
+        tests: ['disc','valenti','most','eace'],
+        competencias: ['Persuasión','Orientación al cliente','Resiliencia','Comunicación efectiva','Cierre de ventas'],
+        descripcion: 'Captación y fidelización de clientes, cumplimiento de cuotas de ventas.',
+        puntajeMinimo: 60,
+        pesoTests: {disc:30, valenti:25, most:25, eace:20},
+        discIdeal: 'I',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Perfil comercial sobresaliente. Alta influencia, motivación de logro y comunicación. Ideal para ventas.',
+          medio: 'Buen potencial comercial. Reforzar técnicas de cierre y manejo de objeciones.',
+          bajo: 'No presenta el perfil motivacional ni comunicativo requerido para ventas.'
+        }
+      },
+      {
+        id: 'jefe_ventas', nombre: 'Jefe / Gerente de Ventas',
+        tests: ['disc','valenti','most','terman'],
+        competencias: ['Liderazgo de equipos','Planificación comercial','Negociación','Análisis de mercado','Coaching'],
+        descripcion: 'Liderazgo del equipo comercial, estrategia de ventas y desarrollo de mercado.',
+        puntajeMinimo: 65,
+        pesoTests: {disc:25, valenti:30, most:25, terman:20},
+        discIdeal: 'D',
+        mostIdeal: 'pod',
+        interpretacion: {
+          alto: 'Líder comercial con perfil estratégico y alta orientación a resultados. Muy recomendado.',
+          medio: 'Potencial de liderazgo comercial. Evaluar historial de gestión de equipos.',
+          bajo: 'No alcanza el perfil de liderazgo requerido para la jefatura comercial.'
+        }
+      },
+      {
+        id: 'atencion_cliente', nombre: 'Atención al Cliente',
+        tests: ['disc','valenti','most','eace'],
+        competencias: ['Empatía','Paciencia','Resolución de problemas','Comunicación','Orientación al servicio'],
+        descripcion: 'Gestión de consultas, reclamos y satisfacción del cliente.',
+        puntajeMinimo: 55,
+        pesoTests: {disc:25, valenti:30, most:20, eace:25},
+        discIdeal: 'S',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Perfil de servicio al cliente excelente. Alta empatía, paciencia y orientación al usuario.',
+          medio: 'Adecuado para el rol. Desarrollar manejo de situaciones de alta presión.',
+          bajo: 'No presenta el perfil de servicio requerido para atención al cliente.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'operaciones', nombre: 'Operaciones y Logística',
+    icon: '⚙️',
+    puestos: [
+      {
+        id: 'operario', nombre: 'Operario de Producción',
+        tests: ['valenti','disc','most'],
+        competencias: ['Seguimiento de instrucciones','Trabajo en equipo','Seguridad laboral','Constancia','Responsabilidad'],
+        descripcion: 'Ejecución de procesos productivos, control de calidad y operación de equipos.',
+        puntajeMinimo: 50,
+        pesoTests: {valenti:40, disc:30, most:30},
+        discIdeal: 'S',
+        mostIdeal: 'seg',
+        interpretacion: {
+          alto: 'Perfil operativo sólido. Alta constancia, seguimiento de instrucciones y trabajo en equipo.',
+          medio: 'Cumple requisitos básicos operativos. Evaluar historial de seguridad y asistencia.',
+          bajo: 'No presenta el perfil de confiabilidad requerido para el área operativa.'
+        }
+      },
+      {
+        id: 'jefe_logistica', nombre: 'Jefe de Logística',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Planificación','Gestión de inventarios','Liderazgo operativo','Análisis de KPIs','Optimización de procesos'],
+        descripcion: 'Gestión de cadena de suministro, inventarios, distribución y equipo logístico.',
+        puntajeMinimo: 62,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Líder logístico con alta capacidad analítica y orientación a procesos. Muy recomendado.',
+          medio: 'Perfil adecuado. Validar experiencia en gestión de cadena de suministro.',
+          bajo: 'No alcanza el perfil requerido para la jefatura de logística.'
+        }
+      },
+      {
+        id: 'almacenero', nombre: 'Almacenero / Auxiliar de Almacén',
+        tests: ['valenti','disc','most'],
+        competencias: ['Orden y organización','Responsabilidad','Trabajo físico','Honestidad','Trabajo en equipo'],
+        descripcion: 'Control de inventario, recepción y despacho de mercadería.',
+        puntajeMinimo: 50,
+        pesoTests: {valenti:40, disc:30, most:30},
+        discIdeal: 'S',
+        mostIdeal: 'seg',
+        interpretacion: {
+          alto: 'Perfil de almacén confiable. Alta responsabilidad, orden y honestidad.',
+          medio: 'Cumple el perfil básico. Verificar referencias de honestidad.',
+          bajo: 'No alcanza el perfil mínimo requerido para el área de almacén.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'rrhh_personas', nombre: 'Recursos Humanos',
+    icon: '👥',
+    puestos: [
+      {
+        id: 'jefe_rrhh', nombre: 'Jefe de Recursos Humanos',
+        tests: ['disc','valenti','most','eace','terman'],
+        competencias: ['Liderazgo de personas','Empatía','Negociación','Gestión del cambio','Ética'],
+        descripcion: 'Gestión del talento humano, cultura organizacional, reclutamiento y bienestar.',
+        puntajeMinimo: 65,
+        pesoTests: {disc:20, valenti:25, most:20, eace:20, terman:15},
+        discIdeal: 'I',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Perfil RRHH sobresaliente. Alta empatía, liderazgo y gestión de personas. Muy recomendado.',
+          medio: 'Perfil adecuado. Evaluar experiencia en gestión del cambio y resolución de conflictos.',
+          bajo: 'No presenta el perfil relacional requerido para liderar el área de personas.'
+        }
+      },
+      {
+        id: 'reclutador', nombre: 'Analista de Selección / Reclutador',
+        tests: ['disc','valenti','most','eace'],
+        competencias: ['Empatía','Comunicación','Análisis de perfiles','Ética','Organización'],
+        descripcion: 'Reclutamiento, selección y evaluación de candidatos.',
+        puntajeMinimo: 58,
+        pesoTests: {disc:25, valenti:30, most:20, eace:25},
+        discIdeal: 'I',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Excelente perfil para selección. Alta empatía, comunicación y ética profesional.',
+          medio: 'Perfil adecuado. Desarrollar habilidades de evaluación y entrevista.',
+          bajo: 'No presenta el perfil relacional requerido para el área de selección.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'tecnologia', nombre: 'Tecnología e Innovación',
+    icon: '💻',
+    puestos: [
+      {
+        id: 'desarrollador', nombre: 'Desarrollador de Software',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Pensamiento lógico','Resolución de problemas','Autonomía','Aprendizaje continuo','Trabajo en equipo'],
+        descripcion: 'Desarrollo, mantenimiento y optimización de sistemas y aplicaciones.',
+        puntajeMinimo: 62,
+        pesoTests: {terman:35, valenti:30, disc:20, most:15},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Perfil técnico sobresaliente. Alta capacidad lógica, autonomía y orientación a la calidad.',
+          medio: 'Buen potencial técnico. Evaluar portafolio de proyectos.',
+          bajo: 'No alcanza el perfil analítico requerido para desarrollo de software.'
+        }
+      },
+      {
+        id: 'jefe_ti', nombre: 'Jefe de TI / Sistemas',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Liderazgo técnico','Pensamiento estratégico','Gestión de proyectos','Innovación','Comunicación técnica'],
+        descripcion: 'Gestión de la infraestructura tecnológica y equipo de desarrollo.',
+        puntajeMinimo: 65,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'D',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Líder tecnológico con visión estratégica y capacidad analítica. Muy recomendado.',
+          medio: 'Perfil adecuado. Evaluar experiencia en gestión de infraestructura.',
+          bajo: 'No alcanza el perfil requerido para liderar el área de tecnología.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'construccion', nombre: 'Construcción e Ingeniería',
+    icon: '🏗️',
+    puestos: [
+      {
+        id: 'arquitecto', nombre: 'Arquitecto / Diseñador',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Creatividad','Pensamiento espacial','Gestión de proyectos','Atención al detalle','Comunicación visual'],
+        descripcion: 'Diseño arquitectónico, planificación de espacios y supervisión de obras.',
+        puntajeMinimo: 62,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Perfil arquitectónico excelente. Alta creatividad, pensamiento analítico y gestión de proyectos.',
+          medio: 'Perfil adecuado. Evaluar portafolio y experiencia en obra.',
+          bajo: 'No alcanza el perfil requerido para el área de diseño y construcción.'
+        }
+      },
+      {
+        id: 'jefe_proyectos', nombre: 'Jefe de Proyectos / Project Manager',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Planificación estratégica','Liderazgo','Gestión de riesgos','Comunicación','Orientación a resultados'],
+        descripcion: 'Planificación, ejecución y control de proyectos multidisciplinarios.',
+        puntajeMinimo: 65,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'D',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Excelente perfil PM. Alta capacidad de planificación, liderazgo y orientación al logro.',
+          medio: 'Buen potencial. Evaluar metodologías de gestión de proyectos (PMI, Agile).',
+          bajo: 'No alcanza el perfil requerido para gestión de proyectos.'
+        }
+      },
+      {
+        id: 'residente_obra', nombre: 'Residente de Obra',
+        tests: ['valenti','disc','most','terman'],
+        competencias: ['Supervisión técnica','Toma de decisiones en campo','Liderazgo operativo','Resolución de problemas','Seguridad'],
+        descripcion: 'Supervisión técnica y administrativa de obras de construcción.',
+        puntajeMinimo: 58,
+        pesoTests: {terman:20, valenti:30, disc:30, most:20},
+        discIdeal: 'D',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Sólido perfil de supervisión en obra. Decisivo, técnico y orientado a resultados.',
+          medio: 'Perfil adecuado. Validar experiencia en campo y manejo de cuadrillas.',
+          bajo: 'No presenta el perfil de liderazgo operativo requerido.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'salud', nombre: 'Salud y Bienestar',
+    icon: '🏥',
+    puestos: [
+      {
+        id: 'medico', nombre: 'Médico / Profesional de Salud',
+        tests: ['terman','valenti','disc','most','eace'],
+        competencias: ['Empatía clínica','Toma de decisiones bajo presión','Ética médica','Comunicación','Actualización continua'],
+        descripcion: 'Atención y diagnóstico de pacientes en entornos clínicos.',
+        puntajeMinimo: 68,
+        pesoTests: {terman:30, valenti:25, disc:15, most:15, eace:15},
+        discIdeal: 'S',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Perfil clínico excelente. Alta capacidad intelectual, empatía y ética. Muy recomendado.',
+          medio: 'Perfil adecuado. Evaluar experiencia clínica y manejo de situaciones de emergencia.',
+          bajo: 'No alcanza el perfil requerido para el área clínica.'
+        }
+      },
+      {
+        id: 'admin_salud', nombre: 'Administrador de Clínica / Hospital',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Gestión hospitalaria','Liderazgo','Planificación','Ética','Orientación al paciente'],
+        descripcion: 'Gestión administrativa y operativa de establecimientos de salud.',
+        puntajeMinimo: 65,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'C',
+        mostIdeal: 'log',
+        interpretacion: {
+          alto: 'Sólido perfil de gestión en salud. Combina capacidad analítica, liderazgo y ética.',
+          medio: 'Perfil adecuado. Evaluar experiencia en gestión de servicios de salud.',
+          bajo: 'No alcanza el perfil requerido para administración en salud.'
+        }
+      },
+    ]
+  },
+  {
+    id: 'educacion', nombre: 'Educación',
+    icon: '🎓',
+    puestos: [
+      {
+        id: 'docente', nombre: 'Docente / Instructor',
+        tests: ['disc','valenti','most','eace'],
+        competencias: ['Comunicación pedagógica','Paciencia','Creatividad didáctica','Empatía','Vocación de servicio'],
+        descripcion: 'Enseñanza, facilitación del aprendizaje y desarrollo de competencias.',
+        puntajeMinimo: 58,
+        pesoTests: {disc:25, valenti:30, most:20, eace:25},
+        discIdeal: 'I',
+        mostIdeal: 'afil',
+        interpretacion: {
+          alto: 'Perfil docente excelente. Alta vocación, comunicación y empatía. Ideal para la enseñanza.',
+          medio: 'Perfil adecuado. Evaluar metodologías pedagógicas y manejo de grupos.',
+          bajo: 'No presenta el perfil vocacional y comunicativo requerido para la docencia.'
+        }
+      },
+      {
+        id: 'director_academico', nombre: 'Director Académico',
+        tests: ['terman','valenti','disc','most'],
+        competencias: ['Liderazgo educativo','Planificación curricular','Gestión de equipos','Innovación pedagógica','Ética'],
+        descripcion: 'Dirección académica, planificación curricular y liderazgo del cuerpo docente.',
+        puntajeMinimo: 65,
+        pesoTests: {terman:25, valenti:30, disc:25, most:20},
+        discIdeal: 'D',
+        mostIdeal: 'pod',
+        interpretacion: {
+          alto: 'Líder académico sobresaliente. Visión estratégica, liderazgo e integridad.',
+          medio: 'Perfil adecuado. Evaluar experiencia en gestión educativa.',
+          bajo: 'No alcanza el perfil requerido para dirección académica.'
+        }
+      },
+    ]
+  },
+];
+
+// Export para uso en otros archivos
+
+// ============================================================
+// BANCO COMPLETO DE PRUEBAS — AssessPro Premium
+// ============================================================
+
+const BANCO_TESTS = {
+
+  // ── YA EXISTENTES ──────────────────────────────────────────
+
+  disc: {
+    id:'disc', nombre:'Perfil DISC', categoria:'comportamiento',
+    icono:'🎯', duracion:10, items:14,
+    descripcion:'Mide estilos de comportamiento: Dominancia, Influencia, Estabilidad y Cumplimiento.',
+    aplica:['liderazgo','ventas','trabajo_equipo','comunicacion'],
+  },
+  cleaver: {
+    id:'cleaver', nombre:'Test Cleaver', categoria:'comportamiento',
+    icono:'🔄', duracion:8, items:14,
+    descripcion:'Mide comportamiento natural vs. adaptado al entorno laboral.',
+    aplica:['adaptacion','liderazgo','trabajo_equipo'],
+  },
+  valenti: {
+    id:'valenti', nombre:'Test Valenti', categoria:'personalidad',
+    icono:'⭐', duracion:12, items:36,
+    descripcion:'Evalúa 6 dimensiones de personalidad laboral: liderazgo, resultados, equipo, análisis, adaptabilidad e integridad.',
+    aplica:['liderazgo','integridad','trabajo_equipo','resultados'],
+  },
+  most: {
+    id:'most', nombre:'Test MOST', categoria:'motivacion',
+    icono:'🔥', duracion:10, items:32,
+    descripcion:'Mide motivaciones dominantes: Logro, Afiliación, Poder y Seguridad.',
+    aplica:['motivacion','liderazgo','ventas','retencion'],
+  },
+  terman: {
+    id:'terman', nombre:'Terman-Merrill (CI)', categoria:'inteligencia',
+    icono:'🧠', duracion:15, items:30,
+    descripcion:'Estimación de capacidad intelectual general mediante razonamiento lógico y verbal.',
+    aplica:['capacidad_analitica','toma_decisiones','aprendizaje'],
+  },
+  eace: {
+    id:'eace', nombre:'Adaptación Cultural EACE-24', categoria:'adaptacion',
+    icono:'🌍', duracion:8, items:24,
+    descripcion:'Mide flexibilidad cognitiva, regulación emocional e identidad intercultural.',
+    aplica:['diversidad','internacional','adaptacion'],
+  },
+
+  // ── NUEVAS PRUEBAS ─────────────────────────────────────────
+
+  bigfive: {
+    id:'bigfive', nombre:'Big Five (OCEAN)', categoria:'personalidad',
+    icono:'🌊', duracion:12, items:30,
+    descripcion:'Modelo de los 5 grandes rasgos de personalidad: Apertura, Responsabilidad, Extraversión, Amabilidad y Neuroticismo.',
+    aplica:['personalidad','trabajo_equipo','liderazgo','ventas'],
+    preguntas: [
+      // Apertura (O)
+      {id:1,texto:'Me gusta explorar nuevas ideas y formas de hacer las cosas.',inv:false,dim:'O'},
+      {id:2,texto:'Disfruto debates filosóficos o abstractos.',inv:false,dim:'O'},
+      {id:3,texto:'Prefiero rutinas establecidas a situaciones novedosas.',inv:true,dim:'O'},
+      {id:4,texto:'Tengo una imaginación activa y creativa.',inv:false,dim:'O'},
+      {id:5,texto:'Me cuesta apreciar el arte o la música.',inv:true,dim:'O'},
+      {id:6,texto:'Me interesan las culturas y formas de vida diferentes a la mía.',inv:false,dim:'O'},
+      // Responsabilidad (C)
+      {id:7,texto:'Cumplo mis compromisos y plazos con consistencia.',inv:false,dim:'C'},
+      {id:8,texto:'Organizo mi trabajo antes de comenzarlo.',inv:false,dim:'C'},
+      {id:9,texto:'Con frecuencia dejo tareas sin terminar.',inv:true,dim:'C'},
+      {id:10,texto:'Soy metódico y ordenado en mi forma de trabajar.',inv:false,dim:'C'},
+      {id:11,texto:'Me cuesta seguir un plan durante mucho tiempo.',inv:true,dim:'C'},
+      {id:12,texto:'Presto atención a los detalles en todo lo que hago.',inv:false,dim:'C'},
+      // Extraversión (E)
+      {id:13,texto:'Disfruto ser el centro de atención en grupos sociales.',inv:false,dim:'E'},
+      {id:14,texto:'Me energiza interactuar con muchas personas diferentes.',inv:false,dim:'E'},
+      {id:15,texto:'Prefiero pasar tiempo solo antes que en reuniones sociales.',inv:true,dim:'E'},
+      {id:16,texto:'Inicio conversaciones con facilidad con desconocidos.',inv:false,dim:'E'},
+      {id:17,texto:'Me siento agotado después de interactuar con mucha gente.',inv:true,dim:'E'},
+      {id:18,texto:'Soy una persona alegre y optimista por naturaleza.',inv:false,dim:'E'},
+      // Amabilidad (A)
+      {id:19,texto:'Me preocupo genuinamente por el bienestar de los demás.',inv:false,dim:'A'},
+      {id:20,texto:'Cedo fácilmente ante los deseos de otros.',inv:false,dim:'A'},
+      {id:21,texto:'Puedo ser frío o distante con personas que no conozco.',inv:true,dim:'A'},
+      {id:22,texto:'Trato de evitar conflictos con los demás.',inv:false,dim:'A'},
+      {id:23,texto:'A veces manipulo a otros para obtener lo que quiero.',inv:true,dim:'A'},
+      {id:24,texto:'Confío fácilmente en las intenciones de los demás.',inv:false,dim:'A'},
+      // Neuroticismo (N) — estabilidad emocional inversa
+      {id:25,texto:'Me pongo ansioso con facilidad ante situaciones de presión.',inv:false,dim:'N'},
+      {id:26,texto:'Mantengo la calma incluso en situaciones difíciles.',inv:true,dim:'N'},
+      {id:27,texto:'Mis estados de ánimo cambian frecuentemente.',inv:false,dim:'N'},
+      {id:28,texto:'Rara vez me siento triste o deprimido sin razón aparente.',inv:true,dim:'N'},
+      {id:29,texto:'Me preocupo excesivamente por cosas que podrían salir mal.',inv:false,dim:'N'},
+      {id:30,texto:'Me siento seguro de mí mismo en la mayoría de situaciones.',inv:true,dim:'N'},
+    ]
+  },
+
+  ie: {
+    id:'ie', nombre:'Inteligencia Emocional (IE)', categoria:'emocional',
+    icono:'❤️', duracion:10, items:28,
+    descripcion:'Evalúa autoconciencia, autorregulación, empatía, motivación y habilidades sociales.',
+    aplica:['liderazgo','ventas','atencion_cliente','rrhh','trabajo_equipo'],
+    preguntas: [
+      // Autoconciencia
+      {id:1,texto:'Reconozco mis emociones en el momento en que las siento.',inv:false,dim:'auto'},
+      {id:2,texto:'Entiendo cómo mis emociones afectan mi desempeño.',inv:false,dim:'auto'},
+      {id:3,texto:'Me cuesta identificar por qué me siento de cierta manera.',inv:true,dim:'auto'},
+      {id:4,texto:'Soy consciente de mis fortalezas y limitaciones emocionales.',inv:false,dim:'auto'},
+      {id:5,texto:'Con frecuencia actúo impulsivamente sin pensar en las consecuencias.',inv:true,dim:'auto'},
+      {id:6,texto:'Tengo claridad sobre mis valores personales y los aplico consistentemente.',inv:false,dim:'auto'},
+      {id:7,texto:'Puedo describir con precisión cómo me siento en cualquier momento.',inv:false,dim:'auto'},
+      // Autorregulación
+      {id:8,texto:'Controlo mis emociones negativas antes de expresarlas.',inv:false,dim:'reg'},
+      {id:9,texto:'Me recupero rápidamente de contratiempos o fracasos.',inv:false,dim:'reg'},
+      {id:10,texto:'Pierdo el control fácilmente cuando estoy bajo presión.',inv:true,dim:'reg'},
+      {id:11,texto:'Adapto mi comportamiento según lo exige la situación.',inv:false,dim:'reg'},
+      {id:12,texto:'Me cuesta mantener la calma en conflictos interpersonales.',inv:true,dim:'reg'},
+      {id:13,texto:'Puedo posponer la gratificación inmediata para lograr metas a largo plazo.',inv:false,dim:'reg'},
+      // Empatía
+      {id:14,texto:'Entiendo fácilmente cómo se sienten otras personas.',inv:false,dim:'emp'},
+      {id:15,texto:'Noto cuando alguien está molesto aunque no lo diga.',inv:false,dim:'emp'},
+      {id:16,texto:'Me cuesta ponerme en el lugar de personas muy diferentes a mí.',inv:true,dim:'emp'},
+      {id:17,texto:'Escucho activamente a los demás sin interrumpir.',inv:false,dim:'emp'},
+      {id:18,texto:'Considero las emociones de mi equipo al tomar decisiones.',inv:false,dim:'emp'},
+      // Motivación
+      {id:19,texto:'Mantengo el optimismo incluso cuando los resultados no llegan.',inv:false,dim:'mot'},
+      {id:20,texto:'Me motivo a mí mismo sin necesitar reconocimiento externo constante.',inv:false,dim:'mot'},
+      {id:21,texto:'Me desanimo con facilidad ante obstáculos.',inv:true,dim:'mot'},
+      {id:22,texto:'Me fijo metas ambiciosas y trabajo persistentemente para lograrlas.',inv:false,dim:'mot'},
+      // Habilidades sociales
+      {id:23,texto:'Resuelvo conflictos de manera constructiva y asertiva.',inv:false,dim:'social'},
+      {id:24,texto:'Genero confianza en las personas con quienes trabajo.',inv:false,dim:'social'},
+      {id:25,texto:'Me cuesta influir positivamente en el comportamiento de otros.',inv:true,dim:'social'},
+      {id:26,texto:'Construyo redes de contacto con facilidad y las mantengo en el tiempo.',inv:false,dim:'social'},
+      {id:27,texto:'Comunico ideas complejas de manera clara y comprensible.',inv:false,dim:'social'},
+      {id:28,texto:'Lidero grupos de trabajo logrando compromiso y cohesión.',inv:false,dim:'social'},
+    ]
+  },
+
+  valores: {
+    id:'valores', nombre:'Test de Valores y Ética Laboral', categoria:'valores',
+    icono:'⚖️', duracion:10, items:24,
+    descripcion:'Evalúa honestidad, lealtad institucional, responsabilidad, justicia y ética en contextos laborales.',
+    aplica:['integridad','finanzas','rrhh','liderazgo','confianza'],
+    preguntas: [
+      // Honestidad
+      {id:1,texto:'Soy transparente con mis superiores incluso cuando las noticias son malas.',inv:false,dim:'hon'},
+      {id:2,texto:'Reporto errores propios sin que me los señalen.',inv:false,dim:'hon'},
+      {id:3,texto:'En ocasiones exagero mis logros para quedar bien.',inv:true,dim:'hon'},
+      {id:4,texto:'Mantengo mi palabra aunque resulte inconveniente.',inv:false,dim:'hon'},
+      {id:5,texto:'He omitido información importante para evitar problemas.',inv:true,dim:'hon'},
+      {id:6,texto:'Actúo de la misma manera cuando me observan y cuando no.',inv:false,dim:'hon'},
+      // Lealtad
+      {id:7,texto:'Hablo bien de mi organización incluso fuera del trabajo.',inv:false,dim:'leal'},
+      {id:8,texto:'Protejo la información confidencial de mi empresa.',inv:false,dim:'leal'},
+      {id:9,texto:'He compartido información interna con personas no autorizadas.',inv:true,dim:'leal'},
+      {id:10,texto:'Me identifico con los valores y misión de mi organización.',inv:false,dim:'leal'},
+      // Responsabilidad
+      {id:11,texto:'Asumo las consecuencias de mis decisiones sin culpar a otros.',inv:false,dim:'resp'},
+      {id:12,texto:'Cumplo mis tareas sin necesidad de supervisión constante.',inv:false,dim:'resp'},
+      {id:13,texto:'Con frecuencia busco excusas cuando no logro los resultados esperados.',inv:true,dim:'resp'},
+      {id:14,texto:'Entrego mi trabajo a tiempo de manera consistente.',inv:false,dim:'resp'},
+      // Justicia
+      {id:15,texto:'Trato a todas las personas con el mismo respeto independientemente de su cargo.',inv:false,dim:'just'},
+      {id:16,texto:'Reconozco los méritos de mis colegas públicamente.',inv:false,dim:'just'},
+      {id:17,texto:'Tomo decisiones que favorecen a ciertas personas por encima de lo correcto.',inv:true,dim:'just'},
+      {id:18,texto:'Defiendo lo que es correcto aunque sea impopular.',inv:false,dim:'just'},
+      // Ética
+      {id:19,texto:'Rechazo participar en prácticas cuestionables aunque sean comunes.',inv:false,dim:'etica'},
+      {id:20,texto:'He actuado en contra de mis valores por presión del entorno.',inv:true,dim:'etica'},
+      {id:21,texto:'Reportaría irregularidades aunque afectara mi posición.',inv:false,dim:'etica'},
+      {id:22,texto:'Mantengo coherencia entre mis principios y mis acciones.',inv:false,dim:'etica'},
+      {id:23,texto:'El fin justifica los medios cuando los resultados son positivos.',inv:true,dim:'etica'},
+      {id:24,texto:'Me siento incómodo cuando se me pide hacer algo que no es ético.',inv:false,dim:'etica'},
+    ]
+  },
+
+  resiliencia: {
+    id:'resiliencia', nombre:'Estrés y Resiliencia Laboral', categoria:'resiliencia',
+    icono:'💪', duracion:10, items:24,
+    descripcion:'Evalúa tolerancia al estrés, capacidad de recuperación y manejo de presión laboral.',
+    aplica:['presion','cambio','operativo','liderazgo','salud_mental'],
+    preguntas: [
+      // Tolerancia al estrés
+      {id:1,texto:'Mantengo mi rendimiento incluso en períodos de alta exigencia.',inv:false,dim:'tol'},
+      {id:2,texto:'El estrés laboral afecta significativamente mi salud física.',inv:true,dim:'tol'},
+      {id:3,texto:'Puedo trabajar con plazos ajustados sin desorganizarme.',inv:false,dim:'tol'},
+      {id:4,texto:'Bajo presión, cometo más errores de lo habitual.',inv:true,dim:'tol'},
+      {id:5,texto:'Separo efectivamente el estrés laboral de mi vida personal.',inv:false,dim:'tol'},
+      {id:6,texto:'Me paralizo cuando enfrento múltiples problemas simultáneamente.',inv:true,dim:'tol'},
+      // Recuperación
+      {id:7,texto:'Me recupero rápidamente de fracasos o errores importantes.',inv:false,dim:'rec'},
+      {id:8,texto:'Aprendo de las experiencias difíciles y las uso para crecer.',inv:false,dim:'rec'},
+      {id:9,texto:'Un fracaso profesional me afecta durante semanas o meses.',inv:true,dim:'rec'},
+      {id:10,texto:'Veo los obstáculos como oportunidades de mejora.',inv:false,dim:'rec'},
+      {id:11,texto:'Me cuesta superar las críticas negativas a mi trabajo.',inv:true,dim:'rec'},
+      {id:12,texto:'Tengo recursos emocionales para afrontar situaciones adversas.',inv:false,dim:'rec'},
+      // Manejo de cambio
+      {id:13,texto:'Me adapto con flexibilidad a cambios inesperados en el trabajo.',inv:false,dim:'cambio'},
+      {id:14,texto:'Los cambios organizacionales me generan ansiedad intensa.',inv:true,dim:'cambio'},
+      {id:15,texto:'Mantengo la productividad durante períodos de incertidumbre.',inv:false,dim:'cambio'},
+      {id:16,texto:'Prefiero un entorno estable y predecible siempre que sea posible.',inv:false,dim:'cambio'},
+      // Bienestar
+      {id:17,texto:'Tengo estrategias efectivas para manejar el estrés.',inv:false,dim:'bien'},
+      {id:18,texto:'Equilibro bien mis responsabilidades laborales y personales.',inv:false,dim:'bien'},
+      {id:19,texto:'Con frecuencia me siento agotado emocionalmente por el trabajo.',inv:true,dim:'bien'},
+      {id:20,texto:'Tengo una red de apoyo que me ayuda en momentos difíciles.',inv:false,dim:'bien'},
+      {id:21,texto:'El trabajo ocupa la mayor parte de mi energía dejando poco para lo demás.',inv:true,dim:'bien'},
+      {id:22,texto:'Mantengo una perspectiva positiva incluso en circunstancias adversas.',inv:false,dim:'bien'},
+      {id:23,texto:'Identifico señales de agotamiento en mí mismo y actúo a tiempo.',inv:false,dim:'bien'},
+      {id:24,texto:'Me siento en control de mi carga de trabajo habitual.',inv:false,dim:'bien'},
+    ]
+  },
+
+  liderazgo: {
+    id:'liderazgo', nombre:'Liderazgo y Toma de Decisiones', categoria:'liderazgo',
+    icono:'👑', duracion:12, items:28,
+    descripcion:'Evalúa estilos de liderazgo, toma de decisiones estratégicas, influencia y desarrollo de equipos.',
+    aplica:['liderazgo','gestion','estrategia','coaching'],
+    preguntas: [
+      // Visión estratégica
+      {id:1,texto:'Anticipo tendencias del entorno que pueden afectar a mi equipo u organización.',inv:false,dim:'vision'},
+      {id:2,texto:'Comunico una visión clara que inspira y orienta a mi equipo.',inv:false,dim:'vision'},
+      {id:3,texto:'Me enfoco en el corto plazo y dejo la estrategia a otros.',inv:true,dim:'vision'},
+      {id:4,texto:'Tomo decisiones considerando su impacto a largo plazo.',inv:false,dim:'vision'},
+      {id:5,texto:'Conecto las tareas diarias con los objetivos estratégicos de la organización.',inv:false,dim:'vision'},
+      {id:6,texto:'Me cuesta ver más allá de los problemas inmediatos.',inv:true,dim:'vision'},
+      // Desarrollo de personas
+      {id:7,texto:'Identifico y potencio el talento de las personas a mi cargo.',inv:false,dim:'dev'},
+      {id:8,texto:'Doy retroalimentación constructiva de manera regular.',inv:false,dim:'dev'},
+      {id:9,texto:'Delego responsabilidades con confianza en las capacidades de mi equipo.',inv:false,dim:'dev'},
+      {id:10,texto:'Invierto tiempo en el coaching y mentoría de mis colaboradores.',inv:false,dim:'dev'},
+      {id:11,texto:'Prefiero hacer yo mismo las tareas antes que enseñar a otros.',inv:true,dim:'dev'},
+      {id:12,texto:'Celebro los logros de mi equipo de manera genuina.',inv:false,dim:'dev'},
+      // Toma de decisiones
+      {id:13,texto:'Tomo decisiones difíciles con firmeza cuando la situación lo requiere.',inv:false,dim:'dec'},
+      {id:14,texto:'Consulto a los involucrados antes de tomar decisiones que los afectan.',inv:false,dim:'dec'},
+      {id:15,texto:'Postergo decisiones importantes para evitar conflictos.',inv:true,dim:'dec'},
+      {id:16,texto:'Evalúo riesgos de manera objetiva antes de decidir.',inv:false,dim:'dec'},
+      {id:17,texto:'Me arrepiento frecuentemente de mis decisiones.',inv:true,dim:'dec'},
+      {id:18,texto:'Asumo la responsabilidad cuando una decisión mía resulta incorrecta.',inv:false,dim:'dec'},
+      // Influencia
+      {id:19,texto:'Logro que otros adopten ideas o cambios que propongo.',inv:false,dim:'inf'},
+      {id:20,texto:'Genero compromiso genuino, no solo cumplimiento formal.',inv:false,dim:'inf'},
+      {id:21,texto:'Me cuesta convencer a personas con opiniones diferentes a las mías.',inv:true,dim:'inf'},
+      {id:22,texto:'Mi presencia cambia positivamente el ambiente de un equipo.',inv:false,dim:'inf'},
+      // Gestión del conflicto
+      {id:23,texto:'Enfrento los conflictos del equipo de manera directa y constructiva.',inv:false,dim:'conf'},
+      {id:24,texto:'Mediación entre personas con posiciones opuestas es algo que manejo bien.',inv:false,dim:'conf'},
+      {id:25,texto:'Evito intervenir en conflictos esperando que se resuelvan solos.',inv:true,dim:'conf'},
+      {id:26,texto:'Transformo tensiones del equipo en oportunidades de mejora.',inv:false,dim:'conf'},
+      {id:27,texto:'Trato con justicia a todas las partes en un conflicto.',inv:false,dim:'conf'},
+      {id:28,texto:'Los conflictos del equipo me generan alta ansiedad.',inv:true,dim:'conf'},
+    ]
+  },
+
+  aptitud: {
+    id:'aptitud', nombre:'Aptitud Específica (Numérica, Verbal, Espacial)', categoria:'aptitud',
+    icono:'📐', duracion:15, items:30,
+    descripcion:'Evalúa razonamiento numérico, comprensión verbal y razonamiento espacial.',
+    aplica:['capacidad_analitica','ingenieria','finanzas','tecnologia','arquitectura'],
+    preguntas: [
+      // Numérica (10 items)
+      {id:1,texto:'Si una empresa tiene 240 empleados y el 35% son mujeres, ¿cuántos hombres hay?',opts:['84','156','126','168'],ans:1,tipo:'mc',dim:'num'},
+      {id:2,texto:'Un producto cuesta $450 y tiene un aumento del 20%. ¿Cuál es el nuevo precio?',opts:['$490','$510','$540','$560'],ans:2,tipo:'mc',dim:'num'},
+      {id:3,texto:'Si produces 120 unidades en 8 horas, ¿cuántas produces en 5 horas?',opts:['70','75','80','85'],ans:1,tipo:'mc',dim:'num'},
+      {id:4,texto:'¿Cuánto es 2/5 de 350?',opts:['120','130','140','150'],ans:2,tipo:'mc',dim:'num'},
+      {id:5,texto:'Un vendedor gana comisión del 8% sobre ventas. Si vendió $12,500, ¿cuánto gana?',opts:['$900','$1,000','$1,100','$1,200'],ans:1,tipo:'mc',dim:'num'},
+      {id:6,texto:'¿Qué número falta? 3, 6, 12, 24, ___',opts:['36','42','48','52'],ans:2,tipo:'mc',dim:'num'},
+      {id:7,texto:'Un proyecto dura 15 semanas. Si hoy es la semana 6, ¿qué porcentaje queda?',opts:['50%','55%','60%','65%'],ans:2,tipo:'mc',dim:'num'},
+      {id:8,texto:'Si A = 3B y B = 4C, y C = 5, ¿cuánto es A?',opts:['45','50','60','75'],ans:2,tipo:'mc',dim:'num'},
+      {id:9,texto:'Una tienda rebaja un artículo de $800 a $600. ¿Cuál es el % de descuento?',opts:['20%','25%','30%','35%'],ans:1,tipo:'mc',dim:'num'},
+      {id:10,texto:'Si 5 máquinas producen 100 piezas en 4 horas, ¿cuántas piezas producen 8 máquinas en 6 horas?',opts:['220','240','260','280'],ans:1,tipo:'mc',dim:'num'},
+      // Verbal (10 items)
+      {id:11,texto:'¿Cuál es el sinónimo de DILIGENTE?',opts:['perezoso','laborioso','descuidado','lento'],ans:1,tipo:'mc',dim:'verb'},
+      {id:12,texto:'¿Cuál es el antónimo de FRUGAL?',opts:['austero','ahorrador','derrochador','prudente'],ans:2,tipo:'mc',dim:'verb'},
+      {id:13,texto:'Completa la analogía: LIBRO es a BIBLIOTECA como CUADRO es a ___',opts:['pintura','museo','artista','color'],ans:1,tipo:'mc',dim:'verb'},
+      {id:14,texto:'¿Cuál palabra NO pertenece al grupo: amable, cordial, afable, hosco, gentil?',opts:['amable','cordial','hosco','gentil'],ans:2,tipo:'mc',dim:'verb'},
+      {id:15,texto:'¿Qué significa PROLIJO?',opts:['rápido','descuidado','detallado y cuidadoso','impreciso'],ans:2,tipo:'mc',dim:'verb'},
+      {id:16,texto:'MÉDICO : HOSPITAL :: JUEZ : ___',opts:['ley','tribunal','abogado','sentencia'],ans:1,tipo:'mc',dim:'verb'},
+      {id:17,texto:'¿Cuál es el sinónimo de PRAGMÁTICO?',opts:['idealista','práctico','teórico','filosófico'],ans:1,tipo:'mc',dim:'verb'},
+      {id:18,texto:'¿Cuál es el antónimo de CONCISO?',opts:['breve','claro','extenso','preciso'],ans:2,tipo:'mc',dim:'verb'},
+      {id:19,texto:'Completa: AGUA es a SED como ALIMENTO es a ___',opts:['cocina','hambre','nutrición','mesa'],ans:1,tipo:'mc',dim:'verb'},
+      {id:20,texto:'¿Qué significa ESCRUPULOSO?',opts:['descuidado','meticuloso y honesto','indiferente','impulsivo'],ans:1,tipo:'mc',dim:'verb'},
+      // Espacial (10 items — razonamiento lógico espacial)
+      {id:21,texto:'Si doblas un cuadrado por la mitad dos veces, ¿cuántas capas tiene?',opts:['2','3','4','6'],ans:2,tipo:'mc',dim:'esp'},
+      {id:22,texto:'Un cubo tiene 6 caras. Si pintas 3 caras adyacentes, ¿cuántas quedan sin pintar?',opts:['2','3','4','5'],ans:1,tipo:'mc',dim:'esp'},
+      {id:23,texto:'¿Cuántos cubos pequeños forman un cubo de 3×3×3?',opts:['9','18','27','36'],ans:2,tipo:'mc',dim:'esp'},
+      {id:24,texto:'Si giras una figura 90° en sentido horario dos veces, ¿cuántos grados giró en total?',opts:['90°','135°','180°','270°'],ans:2,tipo:'mc',dim:'esp'},
+      {id:25,texto:'Un rectángulo de 6×4 cm se divide en cuadrados de 2×2 cm. ¿Cuántos cuadrados hay?',opts:['4','5','6','8'],ans:3,tipo:'mc',dim:'esp'},
+      {id:26,texto:'¿Cuántas caras tiene un prisma triangular?',opts:['3','4','5','6'],ans:2,tipo:'mc',dim:'esp'},
+      {id:27,texto:'Si el espejo muestra la hora 3:15, ¿qué hora es realmente?',opts:['9:45','8:45','9:15','8:15'],ans:0,tipo:'mc',dim:'esp'},
+      {id:28,texto:'Un plano tiene norte al frente. Giras 180°. ¿Hacia dónde miras?',opts:['norte','sur','este','oeste'],ans:1,tipo:'mc',dim:'esp'},
+      {id:29,texto:'¿Cuántos triángulos hay en una figura de estrella de 6 puntas?',opts:['6','8','12','18'],ans:2,tipo:'mc',dim:'esp'},
+      {id:30,texto:'Si doblas una hoja y haces un agujero en el centro del doblez, ¿cuántos agujeros hay al abrirla?',opts:['1','2','3','4'],ans:1,tipo:'mc',dim:'esp'},
+    ]
+  },
+
+};
+
+// ============================================================
+// MATRIZ DE RECOMENDACIÓN POR PERFIL
+// ============================================================
+const RECOMENDACION_TESTS = {
+  // Finanzas
+  jefe_finanzas:    { rec:['terman','valenti','liderazgo','valores','most'],        opt:['disc','resiliencia','bigfive'] },
+  contador:         { rec:['terman','aptitud','valores','valenti'],                  opt:['disc','resiliencia'] },
+  asistente_admin:  { rec:['valenti','ie','valores','disc'],                         opt:['most','resiliencia'] },
+  // Comercial
+  ejecutivo_ventas: { rec:['disc','ie','most','resiliencia'],                        opt:['valenti','bigfive','eace'] },
+  jefe_ventas:      { rec:['disc','liderazgo','most','ie','terman'],                 opt:['valenti','resiliencia'] },
+  atencion_cliente: { rec:['ie','disc','resiliencia','valores'],                     opt:['valenti','most','eace'] },
+  // Operaciones
+  operario:         { rec:['valenti','resiliencia','valores'],                       opt:['disc','most'] },
+  jefe_logistica:   { rec:['terman','aptitud','liderazgo','valenti'],                opt:['disc','resiliencia','most'] },
+  almacenero:       { rec:['valores','valenti','resiliencia'],                       opt:['disc'] },
+  // RRHH
+  jefe_rrhh:        { rec:['ie','liderazgo','bigfive','eace','valores'],             opt:['disc','most','resiliencia'] },
+  reclutador:       { rec:['ie','bigfive','valores','eace'],                         opt:['disc','most'] },
+  // Tecnología
+  desarrollador:    { rec:['terman','aptitud','bigfive','resiliencia'],              opt:['valenti','disc','most'] },
+  jefe_ti:          { rec:['terman','liderazgo','resiliencia','valenti'],            opt:['disc','aptitud','bigfive'] },
+  // Construcción
+  arquitecto:       { rec:['aptitud','terman','valenti','resiliencia'],              opt:['disc','liderazgo','bigfive'] },
+  jefe_proyectos:   { rec:['liderazgo','terman','resiliencia','valenti','most'],     opt:['disc','aptitud'] },
+  residente_obra:   { rec:['liderazgo','resiliencia','valenti','disc'],              opt:['terman','valores','most'] },
+  // Salud
+  medico:           { rec:['terman','ie','valores','resiliencia','bigfive'],         opt:['eace','liderazgo'] },
+  admin_salud:      { rec:['terman','liderazgo','valores','valenti'],                opt:['ie','resiliencia','most'] },
+  // Educación
+  docente:          { rec:['ie','bigfive','valores','eace'],                         opt:['disc','resiliencia','most'] },
+  director_academico:{ rec:['liderazgo','terman','ie','valores','most'],             opt:['bigfive','disc','resiliencia'] },
+};
+
+
+// ============================================================
+// AUTH
+// ============================================================
+let ADMIN_PASS = localStorage.getItem('assesspro_admin_pass') || 'admin2025';
+const ADMIN_EMAIL = 'admin@assesspro.com'; // Cambia este correo
+
+let allEvaluations = [];
+let filteredEvaluations = [];
+
+function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-layout').style.display = 'flex';
+    document.getElementById('tb-date').textContent = new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    loadData();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function doLogout(){
+  document.getElementById('app-layout').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function changePassword(){
+  const np = document.getElementById('new-pass').value.trim();
+  if(np.length < 6) return;
+  ADMIN_PASS = np;
+  localStorage.setItem('assesspro_admin_pass', np);
+  document.getElementById('pass-msg').style.display = 'block';
+  setTimeout(()=>document.getElementById('pass-msg').style.display='none', 3000);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(name){
+  ['dashboard','crear','candidatos','configuracion'].forEach(t=>{
+    document.getElementById(`tab-${t}`).style.display = t===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sb-item').forEach((el,i)=>{
+    el.classList.toggle('active', ['dashboard','crear','candidatos','configuracion'][i] === name);
+  });
+  document.getElementById('topbar-title').textContent = {dashboard:'Dashboard',crear:'Crear link de evaluación',candidatos:'Candidatos evaluados',configuracion:'Configuración'}[name];
+  if(name==='crear') initAdminSelector();
+}
+
+function initAdminSelector(){
+  const sel=document.getElementById('admin-rubro');
+  if(sel.options.length>1) return;
+  RUBROS.forEach(r=>{
+    const opt=document.createElement('option');
+    opt.value=r.id; opt.textContent=r.icon+' '+r.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+function adminRubroChange(){
+  const rubroId=document.getElementById('admin-rubro').value;
+  const pSel=document.getElementById('admin-puesto');
+  pSel.innerHTML='<option value="">— Selecciona el puesto —</option>';
+  document.getElementById('admin-profile-info').style.display='none';
+  document.getElementById('admin-link-box').style.display='none';
+  if(!rubroId)return;
+  const rubro=RUBROS.find(r=>r.id===rubroId);
+  rubro?.puestos.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id; opt.textContent=p.nombre;
+    pSel.appendChild(opt);
+  });
+}
+
+let selectedCustomTests = [];
+
+function adminPuestoChange(){
+  const rubroId=document.getElementById('admin-rubro').value;
+  const puestoId=document.getElementById('admin-puesto').value;
+  document.getElementById('admin-profile-info').style.display='none';
+  document.getElementById('admin-link-box').style.display='none';
+  if(!puestoId)return;
+  const rubro=RUBROS.find(r=>r.id===rubroId);
+  const perfil=rubro?.puestos.find(p=>p.id===puestoId);
+  if(!perfil)return;
+  const recom=RECOMENDACION_TESTS[puestoId]||{rec:perfil.tests||[],opt:[]};
+  selectedCustomTests=[...recom.rec];
+
+  document.getElementById('api-title').textContent=perfil.nombre;
+  document.getElementById('api-desc').textContent=perfil.descripcion;
+  document.getElementById('api-comp').textContent=perfil.competencias.join(', ');
+  document.getElementById('api-min').textContent=perfil.puntajeMinimo;
+
+  // Build interactive test selector
+  const allTests=Object.values(BANCO_TESTS);
+  const catColors={comportamiento:'#c0392b',personalidad:'#8e44ad',motivacion:'#e67e22',inteligencia:'#2980b9',adaptacion:'#1a3a5c',emocional:'#e91e63',valores:'#6d4c41',resiliencia:'#f57c00',liderazgo:'#7b1fa2',aptitud:'#1565c0'};
+  let html='<div style="margin-bottom:10px;font-size:12px;color:#7a8194">Selecciona las pruebas a aplicar. Las marcadas en verde son las recomendadas por el sistema para este perfil.</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  allTests.forEach(t=>{
+    const isRec=recom.rec.includes(t.id);
+    const isOpt=recom.opt.includes(t.id);
+    const isSel=selectedCustomTests.includes(t.id);
+    const borderColor=isRec?'#1d7a4a':isOpt?'#c49a3c':'#e2e0db';
+    const bgColor=isSel?(isRec?'#e8f5e9':'#f0f4f8'):'#f8f7f4';
+    const badge=isRec?'<span style="background:#1d7a4a;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px">Recomendada</span>':isOpt?'<span style="background:#c49a3c;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px">Opcional</span>':'';
+    html+=`<div onclick="toggleCustomTest('${t.id}')" id="ct-${t.id}" style="border:2px solid ${isSel?borderColor:'#e2e0db'};background:${bgColor};border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:13px;font-weight:600;color:#1a3a5c">${t.icono} ${t.nombre}</span>
+        <input type="checkbox" ${isSel?'checked':''} style="accent-color:#1d7a4a;pointer-events:none">
+      </div>
+      ${badge}
+      <div style="font-size:11px;color:#7a8194;margin-top:4px">${t.descripcion}</div>
+      <div style="font-size:10px;color:#c49a3c;margin-top:3px;font-weight:600">⏱ ${t.duracion} min · ${t.items} ítems</div>
+    </div>`;
+  });
+  html+='</div>';
+  html+=`<div id="custom-summary" style="margin-top:10px;padding:8px 12px;background:#f0f4f8;border-radius:6px;font-size:12px;color:#1a3a5c">
+    <strong>${selectedCustomTests.length} pruebas seleccionadas</strong> · Duración estimada: <strong id="custom-dur"></strong>
+  </div>`;
+  document.getElementById('api-tests').innerHTML=html;
+  document.getElementById('admin-profile-info').style.display='block';
+  updateCustomSummary();
+  generateAdminLink(rubroId,puestoId);
+}
+
+function toggleCustomTest(id){
+  const idx=selectedCustomTests.indexOf(id);
+  if(idx>=0){if(selectedCustomTests.length<=1)return;selectedCustomTests.splice(idx,1);}
+  else{selectedCustomTests.push(id);}
+  const el=document.getElementById('ct-'+id);
+  const t=BANCO_TESTS[id];
+  const puestoId=document.getElementById('admin-puesto').value;
+  const rubroId=document.getElementById('admin-rubro').value;
+  const recom=RECOMENDACION_TESTS[puestoId]||{rec:[],opt:[]};
+  const isSel=selectedCustomTests.includes(id);
+  const isRec=recom.rec.includes(id);
+  const borderColor=isRec?'#1d7a4a':'#c49a3c';
+  el.style.border=`2px solid ${isSel?borderColor:'#e2e0db'}`;
+  el.style.background=isSel?(isRec?'#e8f5e9':'#f0f4f8'):'#f8f7f4';
+  el.querySelector('input').checked=isSel;
+  updateCustomSummary();
+  generateAdminLink(rubroId,puestoId);
+}
+
+function updateCustomSummary(){
+  const dur=selectedCustomTests.reduce((a,id)=>a+(BANCO_TESTS[id]?.duracion||10),0);
+  const sumEl=document.getElementById('custom-summary');
+  const durEl=document.getElementById('custom-dur');
+  if(sumEl) sumEl.querySelector('strong').textContent=selectedCustomTests.length+' pruebas seleccionadas';
+  if(durEl) durEl.textContent='~'+dur+' min';
+}
+
+function generateAdminLink(rubroId,puestoId){
+  const baseUrl='https://soft-cajeta-ffb1a8.netlify.app/prueba_candidato.html';
+  const tests=selectedCustomTests.join(',');
+  const link=`${baseUrl}?rubro=${rubroId}&puesto=${puestoId}&tests=${tests}`;
+  const inp=document.getElementById('admin-link-input');
+  if(inp)inp.value=link;
+  document.getElementById('admin-link-box').style.display='block';
+}
+
+function TESTS_CATALOG_NAMES(ids){
+  const map={eace:'Adaptación Cultural',disc:'DISC',valenti:'Valenti',cleaver:'Cleaver',most:'MOST',terman:'Terman-Merrill'};
+  const colors={eace:'#1a3a5c',disc:'#c0392b',valenti:'#27ae60',cleaver:'#8e44ad',most:'#e67e22',terman:'#2980b9'};
+  return ids.map(id=>`<span style="background:${colors[id]||'#888'};color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px">${map[id]||id}</span>`).join('');
+}
+
+function copyAdminLink(){
+  const input=document.getElementById('admin-link-input');
+  navigator.clipboard.writeText(input.value).then(()=>{alert('Link copiado al portapapeles');});
+}
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadData(){
+  allEvaluations = [];
+
+  // Try Firebase first
+  if(window._firebaseReady && window._db){
+    try{
+      const q = window._query(window._collection(window._db, 'evaluaciones'));
+      const snap = await window._getDocs(q);
+      snap.forEach(doc => allEvaluations.push({id: doc.id, ...doc.data()}));
+    }catch(e){ console.warn('Firebase error:', e); }
+  }
+
+  // Also load from localStorage (fallback)
+  try{
+    const local = JSON.parse(localStorage.getItem('assesspro_results') || '[]');
+    local.forEach((ev, i) => {
+      if(!allEvaluations.find(e => e.candidate?.email === ev.candidate?.email && e.completedAt === ev.completedAt)){
+        allEvaluations.push({id: 'local-'+i, ...ev});
+      }
+    });
+  }catch(e){}
+
+  // Sort by date desc
+  allEvaluations.sort((a,b) => new Date(b.completedAt||0) - new Date(a.completedAt||0));
+  filteredEvaluations = [...allEvaluations];
+
+  renderStats();
+  renderRecentList();
+  renderCandidatesTable();
+}
+
+async function refreshData(){ await loadData(); }
+
+// ============================================================
+// STATS
+// ============================================================
+function renderStats(){
+  const n = allEvaluations.length;
+  document.getElementById('st-total').textContent = n;
+
+  if(n === 0){
+    document.getElementById('st-avg').textContent = '–';
+    document.getElementById('st-disc').textContent = '–';
+    document.getElementById('st-iq').textContent = '–';
+    return;
+  }
+
+  const avgs = allEvaluations.map(e => e.global||0).filter(v=>v>0);
+  document.getElementById('st-avg').textContent = avgs.length ? Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length)+'%' : '–';
+
+  const discCounts = {D:0,I:0,S:0,C:0};
+  allEvaluations.forEach(e => { if(e.scores?.disc?.primary) discCounts[e.scores.disc.primary]++; });
+  const topDisc = Object.entries(discCounts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('st-disc').textContent = topDisc[1]>0 ? topDisc[0] : '–';
+
+  const iqs = allEvaluations.map(e=>e.scores?.terman?.iq).filter(v=>v);
+  document.getElementById('st-iq').textContent = iqs.length ? Math.round(iqs.reduce((a,b)=>a+b,0)/iqs.length) : '–';
+}
+
+// ============================================================
+// RECENT LIST
+// ============================================================
+function renderRecentList(){
+  const el = document.getElementById('recent-list');
+  const items = allEvaluations.slice(0,6);
+  if(!items.length){
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No hay evaluaciones completadas aún.<br>Envía el link de prueba a tus candidatos.</div></div>`;
+    return;
+  }
+  el.innerHTML = `<table class="cand-table">
+    <thead><tr><th>Candidato</th><th>Puesto</th><th>Global</th><th>DISC</th><th>CI</th><th>Fecha</th></tr></thead>
+    <tbody>${items.map(e=>buildTableRow(e)).join('')}</tbody>
+  </table>`;
+}
+
+// ============================================================
+// CANDIDATES TABLE
+// ============================================================
+function renderCandidatesTable(){
+  const el = document.getElementById('candidates-table-wrap');
+  if(!filteredEvaluations.length){
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No se encontraron candidatos.</div></div>`;
+    return;
+  }
+  el.innerHTML = `<table class="cand-table">
+    <thead><tr><th>Candidato</th><th>Puesto</th><th>Empresa</th><th>Global</th><th>DISC</th><th>CI</th><th>Nivel</th><th>Fecha</th></tr></thead>
+    <tbody>${filteredEvaluations.map(e=>buildTableRow(e,true)).join('')}</tbody>
+  </table>`;
+}
+
+function buildTableRow(e, extended=false){
+  const c = e.candidate || {};
+  const s = e.scores || {};
+  const g = e.global || 0;
+  const lvl = g>=80?'Alto':g>=65?'Mod-Alto':g>=50?'Moderado':'Bajo';
+  const lvlColor = g>=80?'var(--success)':g>=65?'var(--accent)':g>=50?'var(--warn)':'var(--danger)';
+  const lvlBg = g>=80?'var(--success-bg)':g>=65?'#e8eef5':g>=50?'var(--warn-bg)':'var(--danger-bg)';
+  const discColors = {D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'};
+  const discPrimary = s.disc?.primary || s.cleaver?.primary || '–';
+  const iq = s.terman?.iq || '–';
+  const dateStr = e.completedAt ? new Date(e.completedAt).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'2-digit'}) : '–';
+
+  return `<tr onclick="openCandidate('${e.id}')">
+    <td><div class="cand-name">${c.name||'–'}</div><div class="cand-email">${c.email||''}</div></td>
+    <td style="font-size:12px">${c.position||'–'}</td>
+    ${extended?`<td style="font-size:12px">${c.company||'–'}</td>`:''}
+    <td><span class="score-pill" style="background:${lvlBg};color:${lvlColor}">${g}%</span></td>
+    <td>${discPrimary!=='–'?`<span class="disc-tag-sm" style="background:${discColors[discPrimary]||'#888'}">${discPrimary}</span>`:discPrimary}</td>
+    <td style="font-weight:600;color:var(--accent)">${iq}</td>
+    ${extended?`<td><span class="level-tag" style="background:${lvlBg};color:${lvlColor}">${lvl}</span></td>`:''}
+    <td style="font-size:12px;color:var(--ink3)">${dateStr}</td>
+  </tr>`;
+}
+
+function filterCandidates(q){
+  const lq = q.toLowerCase();
+  filteredEvaluations = allEvaluations.filter(e => {
+    const c = e.candidate||{};
+    return (c.name||'').toLowerCase().includes(lq)||(c.email||'').toLowerCase().includes(lq)||(c.position||'').toLowerCase().includes(lq);
+  });
+  renderCandidatesTable();
+}
+
+// ============================================================
+// DETAIL MODAL
+// ============================================================
+function openCandidate(id){
+  const ev = allEvaluations.find(e=>e.id===id);
+  if(!ev)return;
+  const c = ev.candidate||{};
+  const s = ev.scores||{};
+  const g = ev.global||0;
+  const lvl = g>=80?'Sobresaliente':g>=65?'Alto':g>=50?'Moderado':g>=35?'Bajo':'Insuficiente';
+  const lvlColor = g>=80?'#1d7a4a':g>=65?'#1a3a5c':g>=50?'#8a5c1a':'#8a1a1a';
+  const dateStr = ev.completedAt ? new Date(ev.completedAt).toLocaleString('es-PE') : '–';
+
+  document.getElementById('modal-header').innerHTML = `
+    <div>
+      <div class="modal-name">${c.name||'Candidato'}</div>
+      <div class="modal-meta">${c.position||'–'} · ${c.company||'–'} · ${c.email||''}</div>
+      <div class="modal-global">
+        <span class="mgpill" style="background:rgba(255,255,255,.25);font-weight:700">Global: ${g}% — ${lvl}</span>
+        <span class="mgpill">📅 ${dateStr}</span>
+        <span class="mgpill">🎓 ${c.edu||'–'}</span>
+        <span class="mgpill">💼 ${c.exp||'–'}</span>
+      </div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>`;
+
+  let body = '';
+
+  // Summary table
+  body += buildDetailSummary(s, g);
+
+  // EACE
+  if(s.eace) body += buildEACEDetail(s.eace);
+  // DISC
+  if(s.disc) body += buildDISCDetail(s.disc, 'DISC', 'Perfil DISC');
+  // Valenti
+  if(s.valenti) body += buildValentiDetail(s.valenti);
+  // Cleaver
+  if(s.cleaver) body += buildDISCDetail(s.cleaver, 'Cleaver', 'Test Cleaver');
+  // MOST
+  if(s.most) body += buildMOSTDetail(s.most);
+  // Terman
+  if(s.terman) body += buildTermanDetail(s.terman);
+
+  // Recommendations
+  body += buildRecommendations(s, g);
+
+  // Action buttons
+  window._currentReportId = id;
+  body += '<div style="display:flex;gap:10px;margin-top:1.5rem"><button onclick="runPDFReport()" style="flex:1;padding:12px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-family:Jost,sans-serif;font-size:13px;font-weight:600;cursor:pointer">📄 Imprimir Informe PDF</button></div>';
+
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-overlay').classList.add('open');
+
+  // Animate bars
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w+'%');
+    document.querySelectorAll('.disc-mini-fill[data-h]').forEach(b=>b.style.height=b.dataset.h+'%');
+  }, 80);
+}
+
+function closeModal(e){
+  if(!e || e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ============================================================
+// DETAIL BUILDERS
+// ============================================================
+function buildDetailSummary(s, g){
+  const rows = [];
+  if(s.eace) rows.push({name:'Adaptación Cultural (EACE-24)',pct:s.eace.pct,nivel:levelLabel(s.eace.pct)});
+  if(s.disc) rows.push({name:'Perfil DISC',pct:s.disc.pcts[s.disc.primary],nivel:`Perfil ${s.disc.primary}`});
+  if(s.valenti) rows.push({name:'Test Valenti',pct:s.valenti.pct,nivel:levelLabel(s.valenti.pct)});
+  if(s.cleaver) rows.push({name:'Test Cleaver',pct:s.cleaver.pcts[s.cleaver.primary],nivel:`Perfil ${s.cleaver.primary}`});
+  if(s.most) rows.push({name:'Test MOST',pct:s.most.pct,nivel:levelLabel(s.most.pct)});
+  if(s.terman) rows.push({name:'Terman-Merrill CI',pct:s.terman.pct,nivel:`CI ${s.terman.iq} · ${s.terman.cat}`});
+  return `<div class="detail-section">
+    <div class="ds-title">Resumen de tabulación</div>
+    <table class="sum-table">
+      <thead><tr><th>Batería</th><th>% Logro</th><th>Nivel / Perfil</th></tr></thead>
+      <tbody>
+        ${rows.map(r=>`<tr><td>${r.name}</td><td>${r.pct}%</td><td>${r.nivel}</td></tr>`).join('')}
+        <tr><td>PUNTAJE GLOBAL</td><td>${g}%</td><td>${g>=80?'Sobresaliente':g>=65?'Alto':g>=50?'Moderado':g>=35?'Bajo':'Insuficiente'}</td></tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function buildEACEDetail(sc){
+  const dims=[{id:'flex',name:'Flexibilidad cognitiva',color:'#1a3a5c'},{id:'emo',name:'Regulación emocional',color:'#27ae60'},{id:'social',name:'Competencia social',color:'#2980b9'},{id:'iden',name:'Identidad y resiliencia',color:'#8e44ad'}];
+  const pct=sc.pct;
+  return `<div class="detail-section">
+    <div class="ds-title">Adaptación Cultural — EACE-24 (${pct}%)</div>
+    ${dims.map(d=>{const p=Math.round(sc.dims[d.id].raw/sc.dims[d.id].max*100);return`<div class="bar-row"><div class="bar-label-row"><span class="bar-name">${d.name}</span><span class="bar-pct" style="color:${d.color}">${p}%</span></div><div class="bar-track"><div class="bar-fill" data-w="${p}" style="background:${d.color};width:0"></div></div></div>`;}).join('')}
+    <div class="interp">${pct>=75?'Alta adaptabilidad intercultural. Recurso valioso en equipos multiculturales y organizaciones con proyección internacional.':pct>=55?'Adaptabilidad moderada. Funciona bien en entornos locales. En exposición intercultural intensa puede requerir soporte.':'Adaptabilidad limitada. Evaluar el nivel de diversidad del entorno de trabajo.'}</div>
+  </div>`;
+}
+
+function buildDISCDetail(sc, tag, title){
+  const colors={D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'};
+  const names={D:'Dominancia',I:'Influencia',S:'Estabilidad',C:'Cumplimiento'};
+  const interps={
+    D:`Perfil Dominante (D ${sc.pcts.D}%): Decisivo, orientado a resultados y directo. En Finanzas: fuerte en toma de decisiones y gestión del desempeño. Puede subestimar el detalle analítico.`,
+    I:`Perfil Influyente (I ${sc.pcts.I}%): Comunicativo y persuasivo. Fortaleza en presentación a directivos y negociación. Complementar con procesos de control y seguimiento.`,
+    S:`Perfil Estable (S ${sc.pcts.S}%): Consistente y metódico. Ideal para seguimiento de presupuestos y control interno. Puede ser lento en adaptación a cambios regulatorios.`,
+    C:`Perfil Concienzudo (C ${sc.pcts.C}%): Analítico y preciso. Perfil óptimo para Jefe de Finanzas. Alta compatibilidad con control, auditoría y cumplimiento normativo.`
+  };
+  return `<div class="detail-section">
+    <div class="ds-title">${title} — Perfil ${sc.primary}</div>
+    <div class="disc-mini-bars">
+      ${['D','I','S','C'].map(k=>`<div class="disc-mini-col">
+        <div class="disc-mini-bar-wrap"><div class="disc-mini-fill" data-h="${sc.pcts[k]}" style="background:${colors[k]};height:0;width:100%"></div></div>
+        <div class="disc-mini-lbl" style="color:${colors[k]}">${k}</div>
+        <div class="disc-mini-pct" style="color:${colors[k]}">${sc.pcts[k]}%</div>
+        <div style="font-size:10px;color:var(--ink3)">${names[k]}</div>
+      </div>`).join('')}
+    </div>
+    <div class="interp">${interps[sc.primary]}</div>
+  </div>`;
+}
+
+function buildValentiDetail(sc){
+  const dims=[{id:'lid',name:'Liderazgo',color:'#1a3a5c'},{id:'res',name:'Orientación a resultados',color:'#c0392b'},{id:'team',name:'Trabajo en equipo',color:'#27ae60'},{id:'anal',name:'Pensamiento analítico',color:'#2980b9'},{id:'adap',name:'Adaptabilidad',color:'#8e44ad'},{id:'integ',name:'Integridad',color:'#c49a3c'}];
+  return `<div class="detail-section">
+    <div class="ds-title">Test Valenti — Personalidad Laboral (${sc.pct}%)</div>
+    ${dims.map(d=>{const p=Math.round(sc.dims[d.id].raw/sc.dims[d.id].max*100);return`<div class="bar-row"><div class="bar-label-row"><span class="bar-name">${d.name}</span><span class="bar-pct" style="color:${d.color}">${p}%</span></div><div class="bar-track"><div class="bar-fill" data-w="${p}" style="background:${d.color};width:0"></div></div></div>`;}).join('')}
+    <div class="interp">Dimensiones clave para Jefe de Finanzas: Pensamiento analítico ${Math.round(sc.dims.anal.raw/sc.dims.anal.max*100)}% · Integridad ${Math.round(sc.dims.integ.raw/sc.dims.integ.max*100)}% · Resultados ${Math.round(sc.dims.res.raw/sc.dims.res.max*100)}%</div>
+  </div>`;
+}
+
+function buildMOSTDetail(sc){
+  const dims=[{id:'log',name:'Logro',color:'#c0392b'},{id:'afil',name:'Afiliación',color:'#27ae60'},{id:'pod',name:'Poder',color:'#1a3a5c'},{id:'seg',name:'Seguridad',color:'#c49a3c'}];
+  const dominant=dims.reduce((a,d)=>sc.dims[d.id].raw>sc.dims[a.id].raw?d:a,dims[0]);
+  return `<div class="detail-section">
+    <div class="ds-title">Test MOST — Motivaciones (${sc.pct}%)</div>
+    ${dims.map(d=>{const p=Math.round(sc.dims[d.id].raw/sc.dims[d.id].max*100);return`<div class="bar-row"><div class="bar-label-row"><span class="bar-name">${d.name}</span><span class="bar-pct" style="color:${d.color}">${p}%</span></div><div class="bar-track"><div class="bar-fill" data-w="${p}" style="background:${d.color};width:0"></div></div></div>`;}).join('')}
+    <div class="interp">Motivación dominante: <strong>${dominant.name}</strong>. ${dominant.id==='log'?'Alta orientación al logro: establecer metas claras y KPIs maximizará su desempeño.':dominant.id==='pod'?'Motivado por el liderazgo e influencia. Prospera con autonomía y responsabilidad directiva.':dominant.id==='afil'?'Valora el trabajo en equipo y las relaciones. Entornos colaborativos potencian su desempeño.':'Valora la estabilidad. Se desempeña mejor en entornos predecibles con procedimientos claros.'}</div>
+  </div>`;
+}
+
+function buildTermanDetail(sc){
+  const pct = Math.round(sc.correct/sc.total*100);
+  return `<div class="detail-section">
+    <div class="ds-title">Terman-Merrill — CI estimado: ${sc.iq} (${sc.cat})</div>
+    <div style="display:flex;align-items:center;gap:1.5rem;margin:.75rem 0">
+      <div style="text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--accent);line-height:1">${sc.iq}</div><div style="font-size:12px;font-weight:600;color:var(--gold)">${sc.cat}</div></div>
+      <div style="flex:1"><div class="bar-track" style="height:10px;margin-bottom:6px"><div class="bar-fill" data-w="${pct}" style="background:var(--accent);width:0"></div></div><div style="font-size:12px;color:var(--ink3)">Aciertos: ${sc.correct} de ${sc.total} (${pct}%)</div></div>
+    </div>
+    <div class="interp">${sc.iq>=120?'Capacidad cognitiva muy alta. Excelente para análisis financiero complejo y toma de decisiones estratégicas.':sc.iq>=110?'Buena capacidad intelectual. Manejará solventemente las responsabilidades analíticas del rol.':sc.iq>=90?'Capacidad promedio. Evaluar con prueba técnica específica de conocimientos financieros.':'Capacidad por debajo del promedio para el nivel ejecutivo. Considerar evaluación adicional.'}</div>
+  </div>`;
+}
+
+function buildRecommendations(s, g){
+  const recs=[];
+  if(s.terman&&s.terman.iq>=115)recs.push({type:'success',text:'CI destacado: capacidad analítica superior al promedio ejecutivo'});
+  if(s.valenti&&Math.round(s.valenti.dims.integ.raw/s.valenti.dims.integ.max*100)>=75)recs.push({type:'success',text:'Integridad sobresaliente: dimensión crítica para roles financieros'});
+  if(s.disc&&s.disc.primary==='C')recs.push({type:'success',text:'Perfil DISC-C: alta compatibilidad con control financiero y cumplimiento'});
+  if(s.most&&Math.round(s.most.dims.log.raw/s.most.dims.log.max*100)>=70)recs.push({type:'success',text:'Alta motivación de logro: responde bien a objetivos y KPIs claros'});
+  if(s.valenti&&Math.round(s.valenti.dims.anal.raw/s.valenti.dims.anal.max*100)<55)recs.push({type:'warn',text:'Pensamiento analítico moderado: aplicar prueba técnica financiera'});
+  if(s.valenti&&Math.round(s.valenti.dims.adap.raw/s.valenti.dims.adap.max*100)<50)recs.push({type:'warn',text:'Adaptabilidad limitada: evaluar respuesta a cambios regulatorios'});
+  if(g<55)recs.push({type:'warn',text:'Puntaje global bajo: complementar con entrevista estructurada por competencias'});
+  if(!recs.length)return'';
+  const colorMap={success:'var(--success-bg)',warn:'var(--warn-bg)'};
+  const textMap={success:'var(--success)',warn:'var(--warn)'};
+  return `<div class="detail-section">
+    <div class="ds-title">Recomendaciones para el proceso</div>
+    <div class="rec-tags">${recs.map(r=>`<span class="rec-tag" style="background:${colorMap[r.type]};color:${textMap[r.type]}">${r.text}</span>`).join('')}</div>
+  </div>`;
+}
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportCSV(){
+  const headers=['Nombre','Email','Puesto','Empresa','Exp','Educacion','Global%','NivelGlobal','DISC_Primario','Cleaver_Primario','CI_Terman','Cat_Terman','EACE%','Valenti%','MOST%','Fecha'];
+  const rows=allEvaluations.map(e=>{
+    const c=e.candidate||{};const s=e.scores||{};
+    return[
+      c.name,c.email,c.position,c.company,c.exp,c.edu,
+      e.global,levelLabel(e.global||0),
+      s.disc?.primary||'',s.cleaver?.primary||'',
+      s.terman?.iq||'',s.terman?.cat||'',
+      s.eace?.pct||'',s.valenti?.pct||'',s.most?.pct||'',
+      e.completedAt?new Date(e.completedAt).toLocaleString('es-PE'):''
+    ].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',');
+  });
+  const csv=[headers.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=`assesspro_candidatos_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function levelLabel(pct){return pct>=80?'Alto':pct>=65?'Moderado-Alto':pct>=50?'Moderado':pct>=35?'Bajo':'Insuficiente';}
+
+// ============================================================
+// PDF REPORT GENERATOR
+// ============================================================
+function runPDFReport(){
+  const id = window._currentReportId;
+  if(!id){ alert('Error: no hay candidato seleccionado'); return; }
+  generatePDFReport(id);
+}
+
+function showInlineReport(id){
+  generatePDFReport(id);
+}
+
+function generatePDFReport(id){
+  const ev=allEvaluations.find(e=>e.id===id);
+  if(!ev)return;
+  const c=ev.candidate||{};
+  const s=ev.scores||{};
+  const g=ev.global||0;
+  const lvl=g>=80?'Sobresaliente':g>=65?'Alto':g>=50?'Moderado':g>=35?'Bajo':'Insuficiente';
+  const dateStr=ev.completedAt?new Date(ev.completedAt).toLocaleDateString('es-PE',{year:'numeric',month:'long',day:'numeric'}):'-';
+  const aptitud=g>=65?'APTO':g>=50?'APTO CON RESERVAS':'NO APTO';
+  const aptColor=g>=65?'#1d7a4a':g>=50?'#8a5c1a':'#8a1a1a';
+  const aptBg=g>=65?'#e8f5e9':g>=50?'#fff8e1':'#fde8e8';
+
+  // Build narrative
+  const fortalezas=[],habilidades=[],desarrollo=[],virtudes=[];
+  if(s.terman?.iq>=115){fortalezas.push('Capacidad intelectual superior');habilidades.push('Análisis complejo y modelación estratégica');}
+  else if(s.terman?.iq>=100){fortalezas.push('Capacidad intelectual adecuada para el nivel ejecutivo');}
+  else if(s.terman){desarrollo.push('Capacidad analítica — reforzar con prueba técnica específica');}
+  if(s.valenti){
+    const integ=Math.round(s.valenti.dims.integ.raw/s.valenti.dims.integ.max*100);
+    const anal=Math.round(s.valenti.dims.anal.raw/s.valenti.dims.anal.max*100);
+    const res=Math.round(s.valenti.dims.res.raw/s.valenti.dims.res.max*100);
+    const adap=Math.round(s.valenti.dims.adap.raw/s.valenti.dims.adap.max*100);
+    if(integ>=75){fortalezas.push('Alta integridad y ética profesional');virtudes.push('Honestidad y transparencia');}
+    if(anal>=70){fortalezas.push('Pensamiento analítico desarrollado');habilidades.push('Toma de decisiones basada en datos');}
+    else if(anal<55){desarrollo.push('Pensamiento analítico — requiere fortalecimiento');}
+    if(res>=70){virtudes.push('Perseverancia y orientación al logro');}
+    if(adap<50){desarrollo.push('Adaptabilidad al cambio — área de oportunidad');}
+  }
+  if(s.disc){const dp=s.disc.primary;
+    if(dp==='C'){fortalezas.push('Perfil DISC-C: máxima compatibilidad con roles analíticos');habilidades.push('Control, auditoría y cumplimiento normativo');}
+    else if(dp==='D'){habilidades.push('Toma de decisiones ejecutivas y orientación a resultados');desarrollo.push('Atención al detalle y paciencia procesal');}
+    else if(dp==='I'){habilidades.push('Comunicación ejecutiva y gestión de stakeholders');}
+    else if(dp==='S'){fortalezas.push('Consistencia y confiabilidad en procesos');}
+  }
+  if(s.ie){const p=s.ie.pct;
+    if(p>=75){fortalezas.push('Alta inteligencia emocional');virtudes.push('Empatía, autoregulación y habilidades sociales sobresalientes');}
+    else if(p<50){desarrollo.push('Inteligencia emocional — trabajar autoconciencia y empatía');}
+  }
+  if(s.valores){const p=s.valores.pct;
+    if(p>=80){fortalezas.push('Perfil ético sobresaliente');virtudes.push('Integridad, honestidad y lealtad institucional demostradas');}
+    else if(p<55){desarrollo.push('Reforzar valores de honestidad y responsabilidad');}
+  }
+  if(s.resiliencia){const p=s.resiliencia.pct;
+    if(p>=75){fortalezas.push('Alta resiliencia y tolerancia al estrés');virtudes.push('Se recupera rápido de adversidades y mantiene rendimiento bajo presión');}
+    else if(p<50){desarrollo.push('Resiliencia limitada — puede verse afectado en entornos de alta presión');}
+  }
+  if(s.liderazgo){const p=s.liderazgo.pct;
+    if(p>=75){fortalezas.push('Liderazgo sólido con visión estratégica');habilidades.push('Desarrollo de equipos, toma de decisiones y gestión de conflictos');}
+    else if(p<50){desarrollo.push('Habilidades de liderazgo — fortalecer visión y gestión de personas');}
+  }
+  if(s.bigfive){
+    const O=Math.round(s.bigfive.dims.O?.raw/s.bigfive.dims.O?.max*100)||0;
+    const C=Math.round(s.bigfive.dims.C?.raw/s.bigfive.dims.C?.max*100)||0;
+    const N=Math.round(s.bigfive.dims.N?.raw/s.bigfive.dims.N?.max*100)||0;
+    if(C>=70){virtudes.push('Alta responsabilidad y organización (Big Five)');}
+    if(O>=70){virtudes.push('Apertura a nuevas ideas e innovación');}
+    if(N>=65){desarrollo.push('Estabilidad emocional — manejo del neuroticismo');}
+  }
+  if(s.most){
+    const log=Math.round(s.most.dims.log.raw/s.most.dims.log.max*100);
+    if(log>=70){virtudes.push('Alta motivación de logro — trabaja con excelencia sin supervisión');}
+  }
+  if(s.eace?.pct>=70){virtudes.push('Apertura intercultural y adaptación a entornos diversos');}
+  if(s.aptitud){
+    const p=s.aptitud.pct;
+    if(p>=75){fortalezas.push('Alta aptitud numérica, verbal y espacial');habilidades.push('Razonamiento cuantitativo y análisis de datos');}
+    else if(p<50){desarrollo.push('Aptitud específica — reforzar razonamiento numérico y verbal');}
+  }
+
+  const recNarrative=g>=80?`Perfil psicológico sobresaliente para ${c.position}. Combina capacidad analítica, integridad, liderazgo y resiliencia. Se recomienda proceder con alta confianza.`
+    :g>=65?`Perfil favorable para ${c.position}. Cuenta con las competencias clave con áreas de oportunidad menores. Avanzar en el proceso con entrevista técnica.`
+    :g>=50?`Perfil moderado para ${c.position}. Potencial en dimensiones clave pero con brechas importantes. Complementar con prueba técnica y entrevista estructurada.`
+    :`El perfil presenta brechas significativas para ${c.position}. No cumple estándares mínimos. Se recomienda considerar otros candidatos.`;
+
+  function bar(pct,color,w){w=w||300;return `<div style="display:flex;align-items:center;gap:8px"><div style="width:${w}px;height:8px;background:#eee;border-radius:4px;overflow:hidden;flex-shrink:0"><div style="width:${pct}%;height:100%;background:${color};border-radius:4px"></div></div><span style="font-size:12px;font-weight:600;color:${color}">${pct}%</span></div>`;}
+  function ll(p){return p>=80?'Alto':p>=65?'Mod-Alto':p>=50?'Moderado':p>=35?'Bajo':'Insuficiente';}
+  function pg(num,name,date){return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #e2e0db"><div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#1a3a5c">Assess<span style="color:#c49a3c;font-style:italic">Pro</span></div><div style="font-size:10px;color:#7a8194;text-align:right">${name} · ${date}</div></div>`;}
+  function foot(n){return `<div style="margin-top:20px;padding-top:12px;border-top:1px solid #e2e0db;font-size:10px;color:#7a8194;display:flex;justify-content:space-between"><span>AssessPro · Informe Psicológico Confidencial</span><span>Página ${n}</span></div>`;}
+  function sec(title){return `<div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a3a5c;padding-bottom:7px;border-bottom:2px solid #1a3a5c;margin-bottom:14px">${title}</div>`;}
+  function nb(txt){return `<div style="background:#f0f4f8;border-left:4px solid #1a3a5c;border-radius:0 8px 8px 0;padding:12px 14px;margin:10px 0;font-size:12px;color:#3a3f4b;line-height:1.7">${txt}</div>`;}
+  function tc(name,pct,color){return `<div style="background:#f8f7f4;border-radius:8px;padding:11px 14px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:#1a3a5c">${name}</span><span style="font-size:13px;font-weight:700;color:${color}">${pct}%</span></div>${bar(pct,color,300)}</div>`;}
+
+  // Summary table rows
+  let tblRows='';
+  const testMap={eace:['Adaptación Cultural EACE-24',s.eace?.pct],disc:['Perfil DISC',s.disc?.pcts[s.disc?.primary]],valenti:['Test Valenti',s.valenti?.pct],cleaver:['Test Cleaver',s.cleaver?.pcts[s.cleaver?.primary]],most:['Test MOST',s.most?.pct],terman:['Terman-Merrill CI',s.terman?.pct],bigfive:['Big Five OCEAN',s.bigfive?.pct],ie:['Inteligencia Emocional',s.ie?.pct],valores:['Valores y Ética',s.valores?.pct],resiliencia:['Estrés y Resiliencia',s.resiliencia?.pct],liderazgo:['Liderazgo y Decisiones',s.liderazgo?.pct],aptitud:['Aptitud Específica',s.aptitud?.pct]};
+  Object.entries(testMap).forEach(([k,[name,pct]])=>{
+    if(pct!==undefined&&pct!==null)tblRows+=`<tr><td>${name}</td><td>${pct}%</td><td>${k==='terman'?`CI ${s.terman.iq} · ${s.terman.cat}`:k==='disc'?`Perfil ${s.disc.primary}`:k==='cleaver'?`Perfil ${s.cleaver.primary}`:ll(pct)}</td></tr>`;
+  });
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe — ${c.name}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;color:#1a1a2e;background:#fff;font-size:13px;line-height:1.6}
+.cover{background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;padding:55px 50px;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always}
+.logo{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600}.logo span{color:#e8c060;font-style:italic}
+.ctitle{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;line-height:1.15;margin:55px 0 18px}
+.ctitle em{color:#e8c060;font-style:italic}
+.cbox{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:22px 26px;margin:18px 0}
+.cname{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px}
+.cmeta{font-size:12px;color:rgba(255,255,255,.75);line-height:2}
+.apt{display:inline-block;padding:9px 26px;border-radius:30px;font-size:14px;font-weight:700;margin-top:14px}
+.cfooter{font-size:10px;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.15);padding-top:14px}
+.pg{padding:38px 50px;page-break-after:always}.pg:last-child{page-break-after:auto}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.iitem{background:#f8f7f4;border-radius:6px;padding:10px 14px}
+.ilabel{font-size:10px;color:#7a8194;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.ivalue{font-size:13px;font-weight:500}
+.gscore{text-align:center;background:linear-gradient(135deg,#1a3a5c,#2d5f8a);color:#fff;border-radius:12px;padding:18px;flex-shrink:0;width:130px}
+.gnum{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:700;line-height:1}
+.glbl{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px}
+.glvl{font-size:13px;font-weight:600;color:#e8c060;margin-top:5px}
+.aptbox{border-radius:10px;padding:14px 18px;border:2px solid}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.tbl th{background:#1a3a5c;color:#fff;padding:7px 10px;text-align:left;font-size:11px;font-weight:500}
+.tbl td{padding:7px 10px;border-bottom:1px solid #e2e0db;color:#3a3f4b}
+.tbl tr:last-child td{border-bottom:none;font-weight:600;background:#f8f7f4}
+.tlist{list-style:none;padding:0}
+.tlist li{padding:6px 0;border-bottom:1px solid #e2e0db;font-size:13px;display:flex;align-items:flex-start;gap:8px}
+.tlist li:last-child{border-bottom:none}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.discg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.discc{text-align:center;background:#f8f7f4;border-radius:8px;padding:10px 6px}
+.recbox{border-radius:10px;padding:16px 18px;margin-top:12px}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin:3px}
+.sec2{font-size:13px;font-weight:600;color:#1a3a5c;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover,.gscore{background:linear-gradient(135deg,#1a3a5c,#2d5f8a)!important}}
+</style></head><body>
+
+<!-- PORTADA -->
+<div class="cover">
+  <div><div class="logo">Assess<span>Pro</span></div><div style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;margin-top:3px">Plataforma de Evaluación Psicológica Profesional</div></div>
+  <div>
+    <div class="ctitle">Informe de<br>Evaluación<br><em>Psicológica</em></div>
+    <div class="cbox">
+      <div class="cname">${c.name||'Candidato'}</div>
+      <div class="cmeta"><strong>Puesto:</strong> ${c.position||'-'}<br><strong>Empresa:</strong> ${c.company||'-'}<br><strong>Fecha:</strong> ${dateStr}<br><strong>Experiencia:</strong> ${c.exp||'-'} &nbsp;|&nbsp; <strong>Educación:</strong> ${c.edu||'-'}</div>
+      <div class="apt" style="background:${aptBg};color:${aptColor}">DICTAMEN: ${aptitud}</div>
+    </div>
+  </div>
+  <div class="cfooter">Documento confidencial · Uso exclusivo del equipo de selección · AssessPro © ${new Date().getFullYear()}</div>
+</div>
+
+<!-- PÁG 1: RESUMEN + TABULACIÓN -->
+<div class="pg">
+  ${pg(1,c.name,dateStr)}
+  <div style="margin-bottom:22px">${sec('1. Resumen ejecutivo')}
+    <div class="igrid">
+      <div class="iitem"><div class="ilabel">Nombre</div><div class="ivalue">${c.name||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Correo</div><div class="ivalue">${c.email||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Puesto evaluado</div><div class="ivalue">${c.position||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Empresa</div><div class="ivalue">${c.company||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Experiencia</div><div class="ivalue">${c.exp||'-'}</div></div>
+      <div class="iitem"><div class="ilabel">Educación</div><div class="ivalue">${c.edu||'-'}</div></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;margin:14px 0">
+      <div class="gscore"><div class="gnum">${g}%</div><div class="glbl">Puntaje global</div><div class="glvl">${lvl}</div></div>
+      <div style="flex:1"><div class="aptbox" style="border-color:${aptColor};background:${aptBg}">
+        <div style="font-size:15px;font-weight:700;color:${aptColor};margin-bottom:7px">DICTAMEN: ${aptitud}</div>
+        <div style="font-size:12px;color:${aptColor};line-height:1.7">${recNarrative}</div>
+      </div></div>
+    </div>
+  </div>
+  ${sec('2. Tabla de tabulación general')}
+  <table class="tbl">
+    <thead><tr><th>Batería de evaluación</th><th>% Logro</th><th>Nivel / Perfil</th></tr></thead>
+    <tbody>${tblRows}<tr><td><strong>PUNTAJE GLOBAL</strong></td><td><strong>${g}%</strong></td><td><strong>${lvl}</strong></td></tr></tbody>
+  </table>
+  ${foot(1)}
+</div>
+
+<!-- PÁG 2: PERFIL NARRATIVO -->
+<div class="pg">
+  ${pg(2,c.name,dateStr)}
+  ${sec('3. Perfil psicológico narrativo')}
+  ${fortalezas.length?`<div class="sec2" style="color:#1d7a4a">✦ Fortalezas identificadas</div><ul class="tlist">${fortalezas.map(f=>`<li><div class="dot" style="background:#1d7a4a"></div>${f}</li>`).join('')}</ul>`:'' }
+  ${habilidades.length?`<div class="sec2" style="color:#1a3a5c">✦ Habilidades y competencias</div><ul class="tlist">${habilidades.map(h=>`<li><div class="dot" style="background:#1a3a5c"></div>${h}</li>`).join('')}</ul>`:'' }
+  ${virtudes.length?`<div class="sec2" style="color:#c49a3c">✦ Virtudes y rasgos de carácter</div><ul class="tlist">${virtudes.map(v=>`<li><div class="dot" style="background:#c49a3c"></div>${v}</li>`).join('')}</ul>`:'' }
+  ${desarrollo.length?`<div class="sec2" style="color:#8a5c1a">✦ Áreas de desarrollo</div><ul class="tlist">${desarrollo.map(d=>`<li><div class="dot" style="background:#e67e22"></div>${d}</li>`).join('')}</ul>`:'' }
+
+  ${s.disc?`${sec('4. Perfil DISC — Comportamiento')}
+  <div class="discg">
+    ${['D','I','S','C'].map(k=>{const cl={D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'}[k];const nm={D:'Dominancia',I:'Influencia',S:'Estabilidad',C:'Cumplimiento'}[k];const ip=s.disc.primary===k;return `<div class="discc" style="${ip?'border:2px solid '+cl+';background:#fff':''}">`+`<div style="font-size:20px;font-weight:700;color:${cl}">${k}</div><div style="font-size:10px;color:#7a8194;margin-bottom:5px">${nm}</div>${bar(s.disc.pcts[k],cl,70)}</div>`;}).join('')}
+  </div>
+  ${nb(`<strong>Perfil ${s.disc.primary}:</strong> ${{D:'Estilo Dominante — decisivo y orientado al logro. Aporta capacidad ejecutiva. Puede requerir desarrollo en atención al detalle.',I:'Estilo Influyente — comunicativo y persuasivo. Fuerte en presentación y negociación.',S:'Estilo Estable — consistente y confiable. Alta compatibilidad con procesos y trabajo en equipo.',C:'Estilo Concienzudo — analítico y preciso. Perfil de mayor compatibilidad con roles de control y finanzas.'}[s.disc.primary]||''}`)}`:'' }
+
+  ${s.cleaver?`${sec('5. Test Cleaver — Comportamiento natural')}
+  <div class="discg">
+    ${['D','I','S','C'].map(k=>{const cl={D:'#c0392b',I:'#e67e22',S:'#27ae60',C:'#2980b9'}[k];const nm={D:'Dominancia',I:'Influencia',S:'Estabilidad',C:'Cumplimiento'}[k];const ip=s.cleaver.primary===k;return `<div class="discc" style="${ip?'border:2px solid '+cl+';background:#fff':''}">${`<div style="font-size:20px;font-weight:700;color:${cl}">${k}</div><div style="font-size:10px;color:#7a8194;margin-bottom:5px">${nm}</div>${bar(s.cleaver.pcts[k],cl,70)}</div>`}`;}).join('')}
+  </div>
+  ${nb(`Comportamiento natural <strong>${s.cleaver.primary}</strong>: El Cleaver revela cómo el candidato se comporta de manera espontánea, independientemente del entorno. Comparar con DISC para detectar tensión entre comportamiento natural y adaptado.`)}`:'' }
+  ${foot(2)}
+</div>
+
+<!-- PÁG 3: PERSONALIDAD + MOTIVACIÓN -->
+<div class="pg">
+  ${pg(3,c.name,dateStr)}
+  ${s.valenti?`${sec('6. Test Valenti — Personalidad laboral ('+s.valenti.pct+'%)')}
+  ${[{id:'lid',n:'Liderazgo',c:'#1a3a5c'},{id:'res',n:'Orientación a resultados',c:'#c0392b'},{id:'team',n:'Trabajo en equipo',c:'#27ae60'},{id:'anal',n:'Pensamiento analítico',c:'#2980b9'},{id:'adap',n:'Adaptabilidad',c:'#8e44ad'},{id:'integ',n:'Integridad',c:'#c49a3c'}].map(d=>{const p=Math.round(s.valenti.dims[d.id].raw/s.valenti.dims[d.id].max*100);return tc(d.n,p,d.c);}).join('')}`:'' }
+
+  ${s.bigfive?`${sec('7. Big Five OCEAN — Rasgos de personalidad ('+s.bigfive.pct+'%)')}
+  ${[{id:'O',n:'Apertura a la experiencia',c:'#00897b'},{id:'C',n:'Responsabilidad',c:'#1a3a5c'},{id:'E',n:'Extraversión',c:'#e91e63'},{id:'A',n:'Amabilidad',c:'#27ae60'},{id:'N',n:'Neuroticismo (estabilidad emocional inv.)',c:'#f57c00'}].map(d=>{const dim=s.bigfive.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}
+  ${nb('El Big Five revela rasgos profundos de personalidad. Alta Responsabilidad (C) y baja Neuroticismo (N) son predictores sólidos de desempeño laboral. Alta Apertura (O) favorece roles de innovación y adaptación.')}`:'' }
+
+  ${s.most?`${sec('8. Test MOST — Motivaciones dominantes ('+s.most.pct+'%)')}
+  ${[{id:'log',n:'Motivación de Logro',c:'#c0392b'},{id:'afil',n:'Motivación de Afiliación',c:'#27ae60'},{id:'pod',n:'Motivación de Poder',c:'#1a3a5c'},{id:'seg',n:'Motivación de Seguridad',c:'#c49a3c'}].map(d=>{const p=Math.round(s.most.dims[d.id].raw/s.most.dims[d.id].max*100);return tc(d.n,p,d.c);}).join('')}
+  ${nb(()=>{const dominant=[{id:'log',n:'Logro'},{id:'afil',n:'Afiliación'},{id:'pod',n:'Poder'},{id:'seg',n:'Seguridad'}].reduce((a,d)=>s.most.dims[d.id].raw>s.most.dims[a.id].raw?d:a,{id:'log',n:'Logro'});return `Motivación dominante: <strong>${dominant.n}</strong>. ${{log:'El candidato se mueve por superar metas y alcanzar la excelencia. Responde bien a KPIs y retos.',afil:'Valora las relaciones y el trabajo en equipo. Prospera en culturas colaborativas.',pod:'Orientado al liderazgo e influencia. Busca roles con autoridad y toma de decisiones.',seg:'Valora la estabilidad y predictibilidad. Se desempeña mejor en entornos estructurados.'}[dominant.id]||''}`;})()}`:'' }
+  ${foot(3)}
+</div>
+
+<!-- PÁG 4: EMOCIONAL + ÉTICA + RESILIENCIA -->
+<div class="pg">
+  ${pg(4,c.name,dateStr)}
+  ${s.ie?`${sec('9. Inteligencia Emocional — IE ('+s.ie.pct+'%)')}
+  ${[{id:'auto',n:'Autoconciencia emocional',c:'#e91e63'},{id:'reg',n:'Autorregulación',c:'#9c27b0'},{id:'emp',n:'Empatía',c:'#00897b'},{id:'mot',n:'Motivación emocional',c:'#e67e22'},{id:'social',n:'Habilidades sociales',c:'#1a3a5c'}].map(d=>{const dim=s.ie.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}
+  ${nb('La Inteligencia Emocional es un predictor clave del desempeño en liderazgo, ventas y atención al cliente. Alta IE correlaciona con mejor manejo de conflictos, comunicación efectiva y capacidad de influencia.')}`:'' }
+
+  ${s.valores?`${sec('10. Valores y Ética Laboral ('+s.valores.pct+'%)')}
+  ${[{id:'hon',n:'Honestidad',c:'#1a3a5c'},{id:'leal',n:'Lealtad institucional',c:'#27ae60'},{id:'resp',n:'Responsabilidad',c:'#c49a3c'},{id:'just',n:'Justicia y equidad',c:'#2980b9'},{id:'etica',n:'Ética profesional',c:'#6d4c41'}].map(d=>{const dim=s.valores.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}
+  ${nb(s.valores.pct>=80?'Perfil ético sobresaliente. El candidato demuestra valores sólidos en todas las dimensiones evaluadas. Recurso fundamental para roles con manejo de recursos, información confidencial o toma de decisiones.':s.valores.pct>=60?'Perfil ético adecuado. Validar con referencias laborales y preguntas situacionales en la entrevista.':'Se recomienda profundizar en la entrevista aspectos de honestidad y manejo de dilemas éticos.')}`:'' }
+
+  ${s.resiliencia?`${sec('11. Estrés y Resiliencia Laboral ('+s.resiliencia.pct+'%)')}
+  ${[{id:'tol',n:'Tolerancia al estrés',c:'#f57c00'},{id:'rec',n:'Capacidad de recuperación',c:'#1d7a4a'},{id:'cambio',n:'Manejo del cambio',c:'#7b1fa2'},{id:'bien',n:'Bienestar y equilibrio',c:'#2980b9'}].map(d=>{const dim=s.resiliencia.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}
+  ${nb(s.resiliencia.pct>=75?'Alta resiliencia. El candidato mantiene rendimiento bajo presión y se recupera rápidamente de adversidades. Ideal para entornos exigentes o de alta incertidumbre.':s.resiliencia.pct>=55?'Resiliencia moderada. Evaluar el nivel de exigencia del entorno y establecer mecanismos de soporte.':'Resiliencia limitada. El candidato puede verse significativamente afectado en contextos de alta presión. Considerar el fit con el entorno.')}`:'' }
+  ${foot(4)}
+</div>
+
+<!-- PÁG 5: LIDERAZGO + APTITUD + CI + RECOMENDACIÓN FINAL -->
+<div class="pg">
+  ${pg(5,c.name,dateStr)}
+  ${s.liderazgo?`${sec('12. Liderazgo y Toma de Decisiones ('+s.liderazgo.pct+'%)')}
+  ${[{id:'vision',n:'Visión estratégica',c:'#1a3a5c'},{id:'dev',n:'Desarrollo de personas',c:'#27ae60'},{id:'dec',n:'Toma de decisiones',c:'#c0392b'},{id:'inf',n:'Influencia y persuasión',c:'#e67e22'},{id:'conf',n:'Gestión del conflicto',c:'#8e44ad'}].map(d=>{const dim=s.liderazgo.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}`:'' }
+
+  ${s.aptitud?`${sec('13. Aptitud Específica — Numérica / Verbal / Espacial ('+s.aptitud.pct+'%)')}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
+    ${[{k:'num',n:'Numérica',c:'#1565c0',tot:10},{k:'verb',n:'Verbal',c:'#00897b',tot:10},{k:'esp',n:'Espacial',c:'#7b1fa2',tot:10}].map(d=>{const corr=s.aptitud.dims[d.k]?.corr||0;const p=Math.round(corr/d.tot*100);return `<div style="background:#f8f7f4;border-radius:8px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:${d.c};margin-bottom:4px">${d.n}</div><div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:${d.c}">${p}%</div><div style="font-size:11px;color:#7a8194">${corr}/${d.tot} correctas</div></div>`;}).join('')}
+  </div>`:'' }
+
+  ${s.terman?`${sec('14. Terman-Merrill — Capacidad Intelectual')}
+  <div style="display:flex;gap:16px;align-items:center;margin-bottom:10px">
+    <div style="text-align:center;background:#f0f4f8;border-radius:10px;padding:14px 20px;flex-shrink:0">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:#1a3a5c;line-height:1">${s.terman.iq}</div>
+      <div style="font-size:12px;font-weight:600;color:#c49a3c">${s.terman.cat}</div>
+      <div style="font-size:10px;color:#7a8194;margin-top:3px">CI estimado</div>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:12px;margin-bottom:6px">Aciertos: <strong>${s.terman.correct}/${s.terman.total}</strong> (${s.terman.pct}%)</div>
+      ${bar(s.terman.pct,'#2980b9',280)}
+      ${nb(s.terman.iq>=120?'Capacidad cognitiva muy alta. Procesará con solvencia el análisis complejo y la toma de decisiones estratégicas.':s.terman.iq>=110?'Buena capacidad intelectual. Adecuada para las responsabilidades del cargo.':s.terman.iq>=90?'Capacidad promedio. Complementar con evaluación técnica específica.':'Capacidad por debajo del promedio ejecutivo. Se recomienda evaluación adicional.')}
+    </div>
+  </div>`:'' }
+
+  ${s.eace?`${sec('15. Adaptación Cultural — EACE-24 ('+s.eace.pct+'%)')}
+  ${[{id:'flex',n:'Flexibilidad cognitiva',c:'#1a3a5c'},{id:'emo',n:'Regulación emocional',c:'#27ae60'},{id:'social',n:'Competencia social intercultural',c:'#2980b9'},{id:'iden',n:'Identidad y resiliencia cultural',c:'#8e44ad'}].map(d=>{const dim=s.eace.dims[d.id];if(!dim)return'';const p=Math.round(dim.raw/dim.max*100);return tc(d.n,p,d.c);}).join('')}`:'' }
+
+  ${sec('16. Recomendación final del proceso')}
+  <div class="recbox" style="background:${aptBg};border:2px solid ${aptColor}">
+    <div style="font-size:16px;font-weight:700;color:${aptColor};margin-bottom:8px">DICTAMEN: ${aptitud}</div>
+    <div style="font-size:13px;line-height:1.8;color:${aptColor};margin-bottom:10px">${recNarrative}</div>
+    ${g>=65?`<div style="font-size:12px;color:${aptColor}"><strong>Próximos pasos:</strong><br>${g>=80?'✓ Avanzar a entrevista con gerente del área &nbsp;|&nbsp; ✓ Verificar referencias &nbsp;|&nbsp; ✓ Presentar oferta':'✓ Prueba técnica específica &nbsp;|&nbsp; ✓ Entrevista por competencias &nbsp;|&nbsp; ✓ Verificar referencias laborales'}</div>`:''}
+  </div>
+  ${foot(5)}
+</div>
+
+</body></html>`;
+
+  // Store in sessionStorage
+  try { sessionStorage.setItem('ap_report', html); } catch(e){}
+  
+  // Create a hidden div with the report and print just that
+  let printDiv = document.getElementById('ap-print-area');
+  if(!printDiv){
+    printDiv = document.createElement('div');
+    printDiv.id = 'ap-print-area';
+    document.body.appendChild(printDiv);
+  }
+  
+  // Parse and inject styles + content
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  // Add styles to head if not already there
+  if(!document.getElementById('ap-print-styles')){
+    const styleEl = document.createElement('style');
+    styleEl.id = 'ap-print-styles';
+    styleEl.textContent = Array.from(doc.querySelectorAll('style')).map(s=>s.textContent).join('\n');
+    document.head.appendChild(styleEl);
+  }
+  
+  printDiv.innerHTML = doc.body.innerHTML;
+  
+  // Add print CSS to show only printDiv
+  if(!document.getElementById('ap-print-media')){
+    const mediaStyle = document.createElement('style');
+    mediaStyle.id = 'ap-print-media';
+    mediaStyle.textContent = '@media print { body > *:not(#ap-print-area) { display: none !important; } #ap-print-area { display: block !important; position: static !important; } }';
+    document.head.appendChild(mediaStyle);
+  }
+  
+  // Close modal then print
+  document.getElementById('modal-overlay').classList.remove('open');
+  
+  setTimeout(function(){
+    window.print();
+  }, 500);
+}
+</script>
+</body>
+</html>
