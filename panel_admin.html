@@ -1379,10 +1379,13 @@ function openCandidate(id){
   // Recommendations
   body += buildRecommendations(s, g);
 
-  // Action buttons - embed id directly in onclick
-  body += '<div style="margin-top:1.5rem"><button onclick="generatePDFReport(\'' + id + '\')" style="width:100%;padding:13px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif">📋 Ver Informe Completo</button></div>';
+  // Store report HTML for printing
+  window._lastReportHTML = generatePDFHTML(id);
+  body += '<div style="margin-top:1.5rem;padding:12px;background:#e8f5e9;border-radius:8px;font-size:13px;color:#1d7a4a;text-align:center">✓ Informe listo — presiona <strong>Ctrl+P</strong> para imprimir o guardar como PDF</div>';
 
   document.getElementById('modal-body').innerHTML = body;
+  // Pre-load report for Ctrl+P
+  setTimeout(()=>{ try{ generatePDFReport(id); }catch(e){} }, 200);
   document.getElementById('modal-overlay').classList.add('open');
 
   // Animate bars
@@ -1529,15 +1532,12 @@ function levelLabel(pct){return pct>=80?'Alto':pct>=65?'Moderado-Alto':pct>=50?'
 // ============================================================
 // PDF REPORT GENERATOR
 // ============================================================
-function runPDFReport(){
-  const id = window._currentReportId;
-  if(!id){ alert('Error: no hay candidato seleccionado'); return; }
-  generatePDFReport(id);
-}
+function runPDFReport(){}
+function showInlineReport(id){}
 
-function showInlineReport(id){
-  generatePDFReport(id);
-}
+function generatePDFHTML(id){
+  // Returns HTML string for printing
+  const _buildHtml = true;
 
 function generatePDFReport(id){
   const ev=allEvaluations.find(e=>e.id===id);
@@ -1805,39 +1805,22 @@ body{font-family:'Jost',sans-serif;color:#1a1a2e;background:#fff;font-size:13px;
 
 </body></html>`;
 
-  // Close modal
-  document.getElementById('modal-overlay').classList.remove('open');
-
-  // Get or create fullscreen report container
-  let viewer = document.getElementById('ap-report-viewer');
-  if(!viewer){
-    viewer = document.createElement('div');
-    viewer.id = 'ap-report-viewer';
-    viewer.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto;';
-    document.body.appendChild(viewer);
-  }
-
-  // Build viewer with print button
+  // Inject report into hidden print div
+  let pd = document.getElementById('ap-print-div');
+  if(!pd){ pd=document.createElement('div'); pd.id='ap-print-div'; document.body.appendChild(pd); }
+  
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const reportStyles = Array.from(doc.querySelectorAll('style')).map(s=>s.textContent).join('');
-  const reportBody = doc.body.innerHTML;
-
-  viewer.innerHTML = `
-    <div style="position:sticky;top:0;background:#1a3a5c;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:10000;print-color-adjust:exact">
-      <div style="font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:600">Assess<span style="color:#e8c060;font-style:italic">Pro</span> · Informe</div>
-      <div style="display:flex;gap:10px">
-        <button onclick="window.print()" style="background:#c49a3c;color:#fff;border:none;padding:10px 22px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer">🖨 Imprimir / PDF</button>
-        <button onclick="document.getElementById('ap-report-viewer').style.display='none'" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:10px 16px;border-radius:6px;font-size:13px;cursor:pointer">✕ Cerrar</button>
-      </div>
-    </div>
-    <style>${reportStyles}
-    @media print { #ap-report-viewer > div:first-child { display:none!important; } }
-    </style>
-    <div style="max-width:900px;margin:0 auto;padding:20px">${reportBody}</div>
-  `;
-  viewer.style.display = 'block';
-  viewer.scrollTop = 0;
+  const doc = parser.parseFromString(html,'text/html');
+  const rStyles = Array.from(doc.querySelectorAll('style')).map(s=>s.textContent).join('');
+  pd.innerHTML = '<style>'+rStyles+'</style>' + doc.body.innerHTML;
+  
+  // Add/update print styles
+  let ps = document.getElementById('ap-print-style');
+  if(!ps){ ps=document.createElement('style'); ps.id='ap-print-style'; document.head.appendChild(ps); }
+  ps.textContent = '@media print { body>*:not(#ap-print-div){display:none!important} #ap-print-div{display:block!important;position:static!important} }';
+  pd.style.display='none';
+  
+  return html;
 }
 </script>
 </body>
