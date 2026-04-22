@@ -152,8 +152,8 @@ body{font-family:'Jost',sans-serif;background:var(--surface);color:var(--ink);mi
     <div class="login-sub">Panel de Administración</div>
     <div class="login-err" id="login-err">Credenciales incorrectas. Intenta de nuevo.</div>
     <input type="email" id="login-email" placeholder="Correo de administrador" autocomplete="username">
-    <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Ingresar al panel →</button>
+    <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" onkeyup="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()" type="button">Ingresar al panel →</button>
     <div style="margin-top:1rem;font-size:11px;color:var(--ink3);text-align:center">Acceso restringido · Solo personal autorizado</div>
   </div>
 </div>
@@ -1043,14 +1043,22 @@ let filteredEvaluations = [];
 function doLogin(){
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
+  if(!email || !pass){
+    document.getElementById('login-err').style.display = 'block';
+    return;
+  }
   if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-layout').style.display = 'flex';
-    document.getElementById('tb-date').textContent = new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    loadData();
+    enterPanel();
   } else {
     document.getElementById('login-err').style.display = 'block';
   }
+}
+
+function enterPanel(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-layout').style.display = 'flex';
+  document.getElementById('tb-date').textContent = new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  loadData();
 }
 
 function doLogout(){
